@@ -1,0 +1,54 @@
+.contactBanner {
+  overflow: hidden;
+  padding-top: 100px; 
+  width: 100%;
+  @media (max-width: 960px) {
+    padding-top: clamp(60px,8.4vw,100px);
+  }
+  &__titleArea {
+    position: relative;
+    width: 1200px;
+    height: 300px;
+    padding: 60px 0px 40px 0px;
+    margin: 0 auto;
+    @media (max-width: 1260px) {
+      padding: 40px 20px 40px 20px;
+      width: 100%;
+      height: 30vw;
+      max-height: 300px;
+      min-height: 170px;
+      text-align: center;
+    }
+    @media (max-width: 960px) {
+      height: auto;
+    }
+    &-title {
+      margin: 0 auto;
+      font-size: $banner-title-default;
+      @include fontLineStyle;
+      font-weight: 600;
+      margin-bottom: 40px;
+      color: $black200;
+      @media (max-width: 960px) {
+        font-size: $banner-title-responsive-1260;
+        margin-bottom: 3vw;
+      }
+    }
+    &-subtitle {
+      margin: 0 auto;
+      font-size: $banner-subtitle-default;
+      @include fontLineStyle;
+      color: $black200;
+      font-weight: 300;
+      @media (max-width: 960px) {
+        font-size: $banner-subtitle-responsive-1260;
+      }
+      .mobile-br{
+        display: block;
+        @media (max-width: 700px) {
+          display: none;
+        }
+      }
+    }
+  }
+}

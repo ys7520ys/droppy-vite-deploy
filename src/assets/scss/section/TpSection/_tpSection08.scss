@@ -1,0 +1,63 @@
+.tpSection08 {
+    background-color: #222222;
+    padding: 100px 20px;
+    &__top{
+        padding: 50px 0px;
+        max-width: 1200px;
+        margin: 0 auto;
+        border-bottom: solid 1px #cccccc;
+        // border: solid 1px white;
+        height: 650px;
+        display: flex;
+        .imgBox{
+            width: 500px;
+            height: 500px;
+            background-color: #333333;
+            border-radius: 10px;
+            background-image: url("https://images.pexels.com/photos/707251/pexels-photo-707251.jpeg?auto=compress&cs=tinysrgb&w=600");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+        }
+        .textBox{
+            color: white;
+            padding-left: 70px;
+            width: 600px;
+            .title{
+                font-size: 50px;
+                font-weight: 700;
+            }
+            .subTitle{
+                margin-top: 50px;
+                font-size: 28px;
+                font-weight: 600;
+            }
+            .subInfoText{
+                line-height: 140%;
+                margin-top: 20px;
+                font-size: 16px;
+                color: #cccccc;
+            }
+        }
+    }
+    &__middle{
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 100px 0px;
+        height: 100vh;
+        // border: solid 1px red;
+        .textBox{
+            .title{
+                font-size: 24px;
+                color: white;
+            }
+            .infoText{
+                font-weight: 200;
+                line-height: 150%;
+                font-size: 20px;
+                margin-top: 30px;
+                color: white;
+            }
+        }
+    }
+}

@@ -1,0 +1,53 @@
+.tpBanner01 {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  padding: 0px 50px;
+  &__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 배경처럼 꽉 채움 */
+    z-index: 1;
+    filter: brightness(80%);
+  }
+  &__text {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Pretendard', sans-serif;
+    white-space: pre-line;
+    .title{
+      font-size: 65px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      transition: font-size 0.3s ease;
+      color: white;
+      @include fontLineStyle;
+      @media (max-width: 960px) {
+        font-size: 40px;
+        margin-bottom: 10px;
+      }
+      @media (max-width: 500px) {
+        font-size: 30px;
+      }
+    }
+    .subTitle{
+      font-size: 22px;
+      transition: font-size 0.3s ease;
+      color: #eeeeee;
+      @include fontLineStyle;
+      @media (max-width: 960px) {
+        font-size: 16px;
+      }
+      @media (max-width: 500px) {
+        font-size: 14px;
+      }
+    }
+  }
+}

@@ -1,0 +1,185 @@
+// homePage
+@mixin hoverTextStyle {
+  opacity: 0;
+  transition: opacity 0.5s;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 500;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &:hover {
+    opacity: 1;
+  }
+  @media (max-width: 960px) {
+    display: none;
+  }
+  .hoverTextBox{
+    width: 210px;
+    height: 230px;
+    @media (max-width:1260px) {
+      width: 17vw;
+      height: 20vw;
+    }
+    &__title {
+      left: 78px;
+      font-size: 24px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      @media (max-width: 1260px) {
+        font-size: clamp(20px,1.5vw,24px);
+      }
+    }
+    &__subtitle {
+      display: flex;
+      text-decoration: none;
+      font-size: 16px;
+      line-height: 200%;
+      font-weight: 400;
+      @media (max-width: 1260px) {
+        font-size: clamp(12px,1.3vw,16px);
+      }
+      &-parent {
+        width: 50%;
+      }
+      &-children {
+        width: 50%;
+        color: #cccccc;
+      }
+    }
+  }
+}
+@mixin category-box {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  padding: 13px 20px;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 100px;
+  color: white;
+  font-size: 14px;
+  font-weight: 400;
+  @media (max-width: 960px) {
+    left: 15px;
+    top: 15px;
+    font-size: clamp(12px,3vw,16px);
+    padding: 8px 4vw;
+  }
+}
+@mixin middleSmall-leftRight {
+  width: 50%;
+  height: 100%;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
+}
+@mixin viewAllBtn {
+  position: absolute;
+  right: 0;
+  width: 120px;
+  height: 100%;
+  border-radius: 30px;
+  border: solid 1px #cccccc;
+  font-size: 16px;
+  color: #222222;
+  @media (max-width: 960px) {
+    font-size: clamp(14px,3vw,16px);
+  }
+}
+
+
+
+
+
+
+@mixin w1200-center {
+  width: 1200px;
+  margin: 0 auto;
+}
+
+// img size style
+@mixin img-fit {
+  height: 100%; 
+  img{
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+
+
+@mixin fontLineStyle {
+  line-height: 140%;  
+  letter-spacing: -2.5%;
+}
+
+@mixin respond($breakpoint) {
+  @if $breakpoint == mobile {
+    @media (max-width: 768px) { @content; }
+  } @else if $breakpoint == tablet {
+    @media (max-width: 1024px) { @content; }
+  } @else if $breakpoint == desktop {
+    @media (max-width: 1440px) { @content; }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// contact Style
+@mixin contact__label{
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  display: block;
+  color: $black200;
+  @media (max-width: 960px) {
+    font-size: clamp(14px,3vw,18px);
+  }
+}
+@mixin contact__input{
+  height: 64px;
+  background-color: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  width: 100%;
+  @include fontLineStyle;
+  border-radius: 10px ;
+  font-size: 16px;
+  padding: 18px 20px;
+  box-sizing: border-box;
+  color: $black200;
+  @media (max-width: 960px) {
+    height: 50px;
+    padding: 0px 10px;
+    font-size: 14px;
+  }
+}
+@mixin contact__gap{
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+@mixin contact__inputSlice{
+  height: 64px;
+  background-color: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  font-size: 16px;
+  @media (max-width: 960px) {
+    height: 50px;
+  }
+}

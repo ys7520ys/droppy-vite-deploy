@@ -1,0 +1,42 @@
+:root {
+  --white: #fff;
+  --black: #000;
+  --black100: #111111;
+  --black200: #222222;
+  --mainBlue: #3182d3;
+  --redText: red;
+}
+body{
+  background-color: #222222;
+}
+$white: #fff;
+$redText: red;
+$black: #000;
+$black100: #111111;
+$black200: #222222;
+$mainBlue: #3182d3;
+
+//(banner)
+// default banner font-size
+$banner-title-default: 50px;
+$banner-title-responsive-1260: clamp(24px,4.5vw,50px);
+
+$banner-subtitle-default: 17px;
+$banner-subtitle-responsive-1260: clamp(12px, 3vw ,17px);
+
+// homeBanner font-size
+$homeBanner-title-default: 65px;
+$homeBanner-subtitle-responsive-1260: clamp(30px, 5vw, 65px);
+
+// sr-only style
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

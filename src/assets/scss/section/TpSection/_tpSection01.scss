@@ -1,0 +1,107 @@
+.tpSection01 {
+    height: 1700px;
+    padding-top: 300px;
+    width: 1400px;
+    margin: auto;
+    margin-bottom: 50vh;
+    @media (max-width: 1550px) {
+        padding: 0px 6vw;                
+    }
+    @media (max-width: 1500px) {
+        width: 100%;
+    }
+    @media (max-width: 1260px) {
+        height: 1200px;
+    }
+    @media (max-width: 960px) {
+        height: 1200px;
+    }
+    &__stickyText {
+        position: sticky;
+        top: 300px;
+        background-color: rgba(0, 0, 0, 0);
+        @media (max-width: 1260px) {
+        }
+        @media (max-width: 600px) {
+        }
+        .stickyText__title{
+            background-color: rgba(0, 0, 0, 0);
+            font-size: 60px;
+            transition: font-size 0.3s ease;
+            color: #333333;
+            @media (max-width: 1260px) {
+                font-size: 40px;
+            }
+            @media (max-width: 960px) {
+                font-size: 30px;
+            }
+            @media (max-width: 600px) {
+                font-size: 20px;
+            }
+            @media (max-width: 600px) {
+                font-size: 16px;
+            }
+        }
+
+        .stickyText__subTitle{
+            margin-top: 20px;
+            font-size: 24px;
+            color: #555555;
+            transition: font-size 0.3s ease;
+            @media (max-width: 1260px) {
+                font-size: 20px;
+            }
+            @media (max-width: 960px) {
+                font-size: 16px;
+            }
+            @media (max-width: 600px) {
+                font-size: 10px;
+            }
+        }
+    }
+    &__stickySubText {
+        float: right;
+        width: 600px;
+        @media (max-width: 1260px) {
+            width: 500px;
+        }
+        .stickySubText__text{
+            padding-right: 50px;
+            line-height: 140%;
+            letter-spacing: -2.5%;
+            font-size: 28px;
+            font-weight: 400;
+            transition: font-size 0.3s ease;
+            background-color: #3c3c3c;
+            padding: 40px;
+            border-radius: 20px;
+            color: white;
+            // box-shadow: 20px 10px 10px rgba(0, 0, 0, 0.4);
+            &:nth-last-child(1){
+                margin-top: 500px;
+            }
+
+            @media (max-width: 1260px) {
+                font-size: 20px;
+            }
+            @media (max-width: 960px) {
+                font-size: 18px;
+            }
+            @media (max-width: 600px) {
+                font-size: 12px;
+                padding-right: 10px;
+            }
+            &::before{
+                content: "";
+                position: absolute;
+                bottom: -23px;
+                border-radius: 3px;
+                left: 100px;
+                width: 50px;
+                height: 50px;
+                rotate: 45deg;
+                background-color: #3c3c3c;
+            }
+        }
+    }
+}

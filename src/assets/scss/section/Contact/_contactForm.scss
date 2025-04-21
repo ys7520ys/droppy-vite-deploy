@@ -1,0 +1,305 @@
+.contactForm{
+  padding: 0px 20px;
+  @media (max-width: 960px) {
+    padding: 0px 0px;
+  }
+  &__box {
+    // width: 100%;
+    z-index: 10;
+    box-sizing: border-box;
+    padding: 60px 110px 80px;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    min-height: 500px;
+    width: 1200px;
+    margin: 0 auto;
+    margin-bottom: 60px;
+    @media (max-width: 1260px) {
+      width: 100%;
+      padding: 80px 60px 60px;
+    }
+    @media (max-width: 960px) {
+      padding: 20px 15px 40px;
+      box-shadow: none;
+    }
+    .contact__legend {
+      font-size: 30px;
+      font-weight: 600;
+      @media (max-width: 960px) {
+        font-size: clamp(20px,3vw,30px);
+      }
+    }
+    .contact__nameArea {
+      margin-top: 60px;
+      display: flex;
+      gap: 40px;
+      margin-bottom: 50px;
+      @media (max-width: 1260px) {
+        @include contact__gap;
+        gap: 10px;
+      } 
+      &-item:nth-child(1), &-item:nth-child(2){
+        width: 50%;
+        .contact__label {
+          @include contact__label;
+        }
+        .contact__input {
+          @include contact__input;
+        }
+      }
+    }
+    .contact__emailArea {
+      margin-bottom: 50px;
+      @media (max-width: 1260px) {
+        @include contact__gap;
+      }
+      .contact__label {
+        @include contact__label;
+      }
+      .contact__input {
+        @include contact__input;
+      }
+    }
+    .contact__companyArea {
+      margin-bottom: 50px;
+      @media (max-width: 1260px) {
+        @include contact__gap;
+      }
+      .contact__label {
+        @include contact__label;
+      }
+      .contact__input {
+        @include contact__input;
+      }
+    }
+    .contact__companywebArea {
+      margin-bottom: 50px;
+      @media (max-width: 1260px) {
+        @include contact__gap;
+      }
+      .contact__label {
+        @include contact__label;
+      }
+      .contact__input {
+        @include contact__input;
+      }
+    }
+    .contact__country {
+      margin-bottom: 50px;
+      @media (max-width: 1260px) {
+        @include contact__gap;
+      }
+      .contact__label {
+        @include contact__label;
+      }
+      .contact__input {
+        @include contact__input;
+        appearance: none;
+      }
+    }
+    .contact__phoneArea {
+      margin-top: 60px;
+      margin-bottom: 150px;
+      @media (max-width: 1260px) {
+        @include contact__gap;
+        margin-bottom: 100px;
+      }
+      &-block {
+        .contact__label {
+          @include contact__label;
+        }
+        .contact__inputs {
+          display: flex;
+          gap: 40px;
+          @media (max-width: 1260px) {
+            gap: 10px;
+          }
+          &-input {
+            padding: 18px 20px;
+            box-sizing: border-box;
+            &:nth-child(1){
+              @include contact__input;
+              width: 30%;
+            }
+            &:nth-child(2){
+              @include contact__input;
+              width: 70%;
+            }
+          }
+        }
+      }
+    }
+    .contact__contentTitle {
+      font-size: 30px;
+      font-weight: 600;
+      @media (max-width: 960px) {
+        font-size: clamp(20px,3vw,30px);      }
+    }
+    .contact__contentArea{
+      margin-top: 60px;
+      display: flex;
+      gap: 40px;
+      margin-bottom: 50px;
+      @media (max-width: 1260px) {
+        @include contact__gap;
+        gap: 10px;
+      }
+      &-item{
+        &:nth-child(1){
+          width: 50%;
+          .contact__label {
+            @include contact__label;
+          }
+          .contact__input {
+            @include contact__input;
+          }
+        }
+      }
+      &-item {
+        &:nth-child(2){ 
+          width: 50%;
+          .contact__label {
+            @include contact__label;
+          }
+          .contact__input {
+            @include contact__input;
+          }
+        }
+      }
+    }
+    .contact__titleArea{
+      margin-top: 50px;
+      @media (max-width: 1260px) {
+        @include contact__gap;
+      }
+      .contact__label{
+        @include contact__label;
+      }
+      .contact__input{
+        @include contact__input;
+      }
+    }
+    .contact__content {
+      margin-top: 50px;
+      @media (max-width: 1260px) {
+        @include contact__gap;
+      }
+      .contact__label {
+        @include contact__label;
+      }
+      .contact__input {
+        @include contact__input;
+        resize: none;
+        height: 200px;
+        @media (max-width: 960px) {
+          height: 150px;
+          padding: 15px 20px;
+        }
+      }
+    }
+    .fileThrow{
+      @include contact__gap;
+      &__title{
+        font-size: 20px;
+        margin-bottom: 20px;
+        font-weight: 600;
+        color: $black200;
+        @media (max-width:960px) {
+          font-size: 16px;
+          margin-bottom: 10px;
+        }
+      }
+      &__subTitle{
+        font-size: 16px;
+        padding: 3px 0px;
+        color: #767676;
+        font-weight: 400;
+        @media (max-width:960px) {
+          font-size: 12px;
+        }
+      }
+    }
+    .file__btn {
+      width: 160px;
+      height: 54px;
+      border-radius: 5px;
+      background-color: #464646;
+      color: white;
+      border: none;
+      font-size: 18px;
+      margin-bottom: 100px;
+      @media (max-width:960px) {
+        width: 100%;
+      }
+    }
+    .agreeArea {
+      margin-bottom: 30px;
+      &__title{
+        font-size: 24px;
+        @media (max-width:960px) {
+          font-size: 16px;
+        }
+      }
+      .agreeArea__title{
+        color: $black200;
+      }
+      .agreeArea__info{
+        margin-top: 20px;
+        background-color: rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 10px;
+        padding: 34px 24px 25px;
+        color: #767676;
+        box-sizing: border-box;
+        @media (max-width:960px) {
+          padding: 17px 12px 12.5px;
+        }
+        ul{
+          li{
+            font-size: 16px;
+            padding: 5px 0px;
+            @media (max-width:960px) {
+              font-size: 12px;
+            }
+            &:last-of-type{
+              margin-top: 40px;
+            }
+          }
+        }
+      }
+    }
+    .agreeBtn{
+      padding-right: 40px;
+      font-size: 18px;
+      @media (max-width: 960px) {
+        padding-right: 20px;
+        font-size: 14px;
+      }
+      input{
+        margin-right: 5px;
+      }
+    }
+    .gotoBtn {
+      margin: 0 auto;
+      margin-top: 60px;
+      display: block;
+      width: 320px;
+      height: 90px;
+      border-radius: 10px;
+      border: none;
+      font-size: 22px;
+      font-weight: 600;
+      background-color: #222222;
+      color: white;
+      @media (max-width:960px) {
+        margin-top: 30px;
+        width: 100%;
+        height: 54px;
+        border-radius: 5px;
+        font-size: 18px;
+        font-weight: 500;
+      }
+    }
+    
+  }
+}

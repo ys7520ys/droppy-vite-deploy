@@ -1,0 +1,109 @@
+.Tpsection07 {
+  background-color: #222222;
+  padding: 250px 0px 100px 0px;
+  @media (max-width: 700px) {
+    padding: 150px 0px;
+  }
+  &__titleBox{
+    color: white;
+    text-align: center;
+    margin-bottom: 70px;
+    @media (max-width:700px) {
+      margin-bottom: 40px;
+    }
+    .title{
+      font-weight: 700;
+      font-size: 45px;
+      @media (max-width: 700px) {
+        font-size: 24px;
+      }
+    }
+    .subTitle{
+      margin-top: 14px;
+      font-size: 20px;
+      font-weight: 400;
+      @media (max-width: 700px) {
+        font-size: 14px;
+        margin-top: 10px;
+      }
+    }
+  }
+  .progress-wrapper {
+    max-width: 1000px;
+    margin:  0 auto;
+    display: flex;
+    flex-wrap: wrap;
+
+    .circular-progress {
+      position: relative;
+      width: 270px;
+      height: 270px;
+      margin: 0 auto;
+      @media (max-width: 960px) {
+        width: 240px;
+        height: 240px;
+      }
+    
+      @media (max-width: 760px) {
+        width: 200px;
+        height: 200px;
+      }
+      @media (max-width: 600px) {
+        width: 160px;
+        height: 160px;
+      }
+    
+      &__svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+    
+      &__bg,
+      &__bar {
+        fill: none;
+        stroke-linecap: round;
+      }
+    
+      &__bg {
+        stroke: #e0e0e0;
+      }
+    
+      &__bar {
+        stroke: #3a86ff;
+        transition: stroke-dashoffset 0.4s ease;
+      }
+    
+      &__text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: white;
+        strong {
+          font-size: 40px;
+          @media (max-width: 960px) {
+            font-size: 32px;
+          }
+          @media (max-width: 700px) {
+            font-size: 28px;
+          }
+        }
+    
+        .circular-progress__label {
+          margin-top: 4px;
+          font-size: 22px;
+    
+          @media (max-width: 960px) {
+            font-size: 18px;
+          }
+          @media (max-width: 700px) {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+}
+

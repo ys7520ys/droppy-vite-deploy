@@ -1,0 +1,61 @@
+.newsGridCard{
+  &__contents {
+    width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    row-gap: 35px;
+    column-gap: 15px;
+    padding-bottom: 60px;
+    @media (max-width: 1260px) {
+      width: 100%;
+      padding: 0px 20px 60px;
+      grid-template-columns: repeat(3,1fr);
+      row-gap: 2.5vw;
+      column-gap: 1.5vw;
+    }
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(2,1fr); 
+      row-gap: 2.5vw;
+      column-gap: 2vw;
+    }
+    @media (max-width: 960px) {
+      padding: 0px 10px 80px;
+    }
+    @media (max-width: 550px) {
+      grid-template-columns: repeat(1,1fr); 
+      row-gap: 2.5vw;
+      column-gap: 2vw;
+    }
+    .item {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.15);
+      &__img {
+        img{
+          height: 100%;
+          width: 100%;
+          object-fit: cover;
+        }
+      }
+      &__text {
+        height: auto;
+        padding: 16px 24px 30px;
+        font-size: 18px;
+        font-weight: 300;
+        color: $black200;
+        @media (max-width: 1260px) {
+          font-size: clamp(14px, 1.5vw, 18px);
+        }
+        @media (max-width: 1024px) {
+          padding: 1.5vw 3vw 3vw;
+          font-size: clamp(14px, 2vw, 18px);
+        }
+        @media (max-width: 550px) {
+          padding: 2vw 4vw 6vw;
+          font-size: clamp(14px, 3vw, 18px);
+        }
+      }
+    }
+  }
+}
