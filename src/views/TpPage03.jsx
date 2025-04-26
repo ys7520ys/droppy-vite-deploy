@@ -1376,6 +1376,10 @@ import TpBannerSwiper from "../components/TpBanner/TpBannerSwiper";
 import TpLogoInfiniteSlider from "../components/TpSection/TpLogoInfiniteSlider";
 import Tpsection04 from "../components/TpSection/TpSection04";
 import Tpsection02 from "../components/TpSection/TpSection02";
+import TpSectionPortfolio from "../components/TpSection/TpSectionPortfolio";
+import TpProjectSlider from "../components/TpSection/TpProjectSlider";
+import TpTeamStructure from "../components/TpSection/TpTeamStructure";
+import TpEventGrid from "../components/TpSection/TpEventGrid";
 import Tpsection07 from "../components/TpSection/TpSection07";
 import TpSection06 from "../components/TpSection/TpSection06";
 
@@ -1386,6 +1390,10 @@ const componentMap = {
   섹션04: Tpsection04,
   섹션06: TpSection06,
   섹션07: Tpsection07,
+  섹션포트폴리오: TpSectionPortfolio, // ✅ 추가
+  프로젝트슬라이드: TpProjectSlider, // ✅ 등록
+  팀구성: TpTeamStructure, // ✅ 등록 완료
+  행사그리드: TpEventGrid
 };
 
 // ✅ 드래그 가능한 컴포넌트
@@ -1538,7 +1546,11 @@ function TpPage03() {
       { type: "섹션04", label: "섹션04" },
       { type: "섹션06", label: "섹션06" },
       { type: "섹션07", label: "섹션07" },
-      { type: "배너로고슬라이드", label: "로고 슬라이드" }
+      { type: "배너로고슬라이드", label: "로고 슬라이드" },
+      { type: "섹션포트폴리오", label: "섹션 포트폴리오" }, // ✅ 추가
+      { type: "프로젝트슬라이드", label: "프로젝트 슬라이드" }, // ✅ 추가
+      { type: "팀구성", label: "팀 구성" }, // ✅ 추가!
+      { type: "행사그리드", label: "행사그리드" }, // ✅ 추가!
     ],
   };
 
@@ -1556,6 +1568,80 @@ function TpPage03() {
         { title: "슬라이드 2", subTitle: "서브2", imageUrl: "", align: "center" },
       ];
     }
+    else if (item.type === "팀구성") {
+      newItem.data = [
+        {
+          number: "①",
+          title: "Project Manager",
+          items: [
+            { en: "Project Planning", ko: "프로젝트 일정관리", detail: "전체 일정 조율 및 계획 수립" },
+            { en: "Contents Organization", ko: "콘텐츠 정리", detail: "콘텐츠 항목 분류 및 구조화" },
+          ],
+        },
+        {
+          number: "②",
+          title: "Design",
+          items: [
+            { en: "Website Design", ko: "웹사이트 디자인", detail: "웹사이트 UI/UX 화면 설계" },
+          ],
+        },
+      ];
+    }
+    else if (item.type === "섹션포트폴리오") {
+      newItem.data = [
+        {
+          id: 1,
+          mediaType: "image",
+          mediaUrl: "https://via.placeholder.com/300x400?text=Sample1",
+          brand: "boribori",
+          description: "app renewal ux design",
+        },
+        {
+          id: 2,
+          mediaType: "image",
+          mediaUrl: "https://via.placeholder.com/300x400?text=Sample2",
+          brand: "SSF SHOP",
+          description: "2023 fall lookbook",
+        },
+      ];
+    }
+    else if (item.type === "프로젝트슬라이드") {
+      // 슬라이드는 기본값 안 줘도 되고 빈 객체로 충분!
+      newItem.data = []; // (선택 사항: 기본값이 컴포넌트 안에 있으니까 생략해도 됨)
+    }
+    else if (item.type === "행사그리드") {
+      newItem.data = [
+        {
+          id: Date.now() + 1,
+          type: "Exhibition",
+          title: "The Seoul Illustration Fair 2023",
+          date: "2023.05.16 - 05.20",
+          thumbnail: "",
+        },
+        {
+          id: Date.now() + 2,
+          type: "Convention",
+          title: "2023 세계 제약ㆍ바이오 산업 전시회",
+          date: "2023.05.26 - 08.25",
+          thumbnail: "",
+        },
+        {
+          id: Date.now() + 3,
+          type: "Event",
+          title: "2023 하반기 아일랜드 유학 설명회",
+          date: "2023.06.01 - 08.25",
+          thumbnail: "",
+        },
+        {
+          id: Date.now() + 4,
+          type: "Custom",
+          title: "PIS 2023 DIGITAL SHOW",
+          date: "2023.06.01 - 08.25",
+          thumbnail: "https://via.placeholder.com/400x500?text=PIS+2023",
+        },
+      ];
+    }
+    
     else if (item.type === "섹션04") {
       newItem.boxes = [
         { title: "통밀 바게트", subtitle: "건강한 시작을 위한 통밀의 고소함", description: "식사빵으로도 어울리는 담백한 통밀 바게트...", imageClass: "" },
