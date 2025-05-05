@@ -171,7 +171,10 @@
 
 import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { HelmetProvider } from "react-helmet-async";
-import { BrowserRouter as Router } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  useLocation,
+} from "react-router-dom";
 import Aos from "aos";
 import gsap from "gsap";
 import "aos/dist/aos.css";
@@ -187,7 +190,7 @@ import { aboutSwiper } from "./constants/data/about";
 import { newsGridCard } from "./constants/data/news";
 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore"; // ✅ Firestore import 추가
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 const preloadImages = (imageList) => {
   imageList.forEach((src) => {
@@ -196,12 +199,41 @@ const preloadImages = (imageList) => {
   });
 };
 
+// // 👉 핵심: 라우팅 안에서 조건부 렌더링을 위해 별도 컴포넌트로 구성
+// const AppLayout = ({ user, loading, setUser }) => {
+//   const location = useLocation();
+//   const isPreview = location.pathname.startsWith("/preview");
+
+//   return (
+//     <>
+//       {!isPreview && <TpHeader02 user={user} />}
+//       <AnimateRoutes user={user} loading={loading} setUser={setUser} />
+//       {!isPreview && <TpFooter01 />}
+//     </>
+//   );
+// };
+const AppLayout = ({ user, loading, setUser }) => {
+  const location = useLocation();
+  const isCustomHeaderPage = ["/preview", "/productPage03"].some(path =>
+    location.pathname.startsWith(path)
+  );
+
+  return (
+    <>
+      {!isCustomHeaderPage && <TpHeader02 user={user} />}
+      <AnimateRoutes user={user} loading={loading} setUser={setUser} />
+      {!isCustomHeaderPage && <TpFooter01 />}
+    </>
+  );
+};
+
+
+
 const App = () => {
-  const [user, setUser] = useState(null); // ✅ 유저 상태
-  const [loading, setLoading] = useState(true); // ✅ 로딩 상태
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const containerRef = useRef();
 
-  // ✅ Firebase 인증 + Firestore에서 isAdmin 불러오기
   useEffect(() => {
     const auth = getAuth();
     const db = getFirestore();
@@ -243,12 +275,6 @@ const App = () => {
     return () => unsubscribe();
   }, []);
 
-  // ✅ 로깅용 콘솔
-  useEffect(() => {
-    console.log("🔥 user 상태:", user);
-    console.log("⌛ loading 상태:", loading);
-  }, [user, loading]);
-
   useEffect(() => {
     const script = document.createElement("script");
     script.src = `${process.env.PUBLIC_URL}/smoothScroll.js`;
@@ -269,7 +295,6 @@ const App = () => {
     }
   }, []);
 
-  // ✅ 네이버 로그인 정보가 남아 있다면 복구
   useEffect(() => {
     const savedUser = localStorage.getItem("naverUser");
     if (savedUser) {
@@ -277,7 +302,6 @@ const App = () => {
     }
   }, []);
 
-  // ✅ 이미지 프리로드
   useEffect(() => {
     const allImages = [
       ...homeMainLicense.mainLicense_img.map((item) => item.img),
@@ -293,25 +317,21 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    Aos.init({
-      duration: 600,
-      once: false,
-    });
+    Aos.init({ duration: 600, once: false });
     Aos.refresh();
-  });
+  }, []);
 
   return (
     <HelmetProvider>
       <Router>
-        <TpHeader02 user={user} />
-        <AnimateRoutes user={user} loading={loading} setUser={setUser} />
-        <TpFooter01 />
+        <AppLayout user={user} loading={loading} setUser={setUser} />
       </Router>
     </HelmetProvider>
   );
 };
 
 export default App;
+
 
 
 

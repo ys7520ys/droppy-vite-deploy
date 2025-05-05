@@ -14,7 +14,7 @@
 //     answer: 'A. 언제든지 편하게 방문하실 수 있도록 오프라인 매장은 물론, 온라인 예약 및 픽업도 지원하고 있어요. 가까운 날에 미리 주문해두시면 따뜻한 빵으로 준비해드립니다.',
 //   },
 //   {
-//     question: 'Q4. “정성이 담긴 식사”라는 건 무슨 의미인가요?',
+//     question: 'Q4. "정성이 담긴 식사"라는 건 무슨 의미인가요?',
 //     answer: 'A. 식사는 단순한 배 채움이 아니라, 하루를 대하는 자세라고 믿어요. 빵 한 조각이더라도 그 안에 정직한 재료와 따뜻한 마음이 담겨 있으면몸도 마음도 만족스러울 수 있다고 생각해요.',
 //   },
 //   {
@@ -154,7 +154,7 @@ const EditTitleModal = ({ titleText, subTitleText, align, onChange, onClose }) =
   );
 };
 
-function TpSection06({ data = [], titleText: initialTitle = "자주 묻는 질문들", subTitleText: initialSub = "자주 들어오는 질문과 답변을 모았습니다.", align: initialAlign = 'center', onUpdate }) {
+function TpSection06({ data = [], titleText: initialTitle = "자주 묻는 질문들", subTitleText: initialSub = "자주 들어오는 질문과 답변을 모았습니다.", align: initialAlign = 'center', onUpdate, isPreview = false }) {
   const [faqList, setFaqList] = useState(data);
   const [openIndex, setOpenIndex] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
@@ -191,8 +191,8 @@ function TpSection06({ data = [], titleText: initialTitle = "자주 묻는 질�
     <section className="Tpsection06">
       <div
         className="Tpsection06__textBox"
-        onClick={() => setEditingTitle(true)}
-        style={{ cursor: 'pointer', textAlign }}
+        onClick={() => { if (!isPreview) setEditingTitle(true); }}
+        style={{ cursor: isPreview ? 'default' : 'pointer', textAlign }}
       >
         <h2 className="title">{titleText}</h2>
         <h3 className="subTitle">
@@ -204,7 +204,7 @@ function TpSection06({ data = [], titleText: initialTitle = "자주 묻는 질�
 
       <div className="faq-container">
         {faqList.map((item, index) => (
-          <div className="faq-item" key={index} onClick={() => setEditingIndex(index)} style={{ cursor: 'pointer' }}>
+          <div className="faq-item" key={index} onClick={() => { if (!isPreview) setEditingIndex(index); }} style={{ cursor: isPreview ? 'default' : 'pointer' }}>
             <button
               className={`faq-question ${openIndex === index ? 'open' : ''}`}
               onClick={() => toggleFAQ(index)}
@@ -227,11 +227,13 @@ function TpSection06({ data = [], titleText: initialTitle = "자주 묻는 질�
         ))}
       </div>
 
-      <div style={{ marginTop: 20, textAlign: 'center' }}>
-        <button onClick={handleAddFaq} style={{ padding: '10px 20px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '8px', cursor: 'pointer' }}>+ 라인 추가</button>
-      </div>
+      {!isPreview && (
+        <div style={{ marginTop: 20, textAlign: 'center' }}>
+          <button onClick={handleAddFaq} style={{ padding: '10px 20px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '8px', cursor: 'pointer' }}>+ 라인 추가</button>
+        </div>
+      )}
 
-      {editingIndex !== null && (
+      {!isPreview && editingIndex !== null && (
         <EditFaqModal
           data={faqList[editingIndex]}
           onChange={handleFaqChange}
@@ -239,7 +241,7 @@ function TpSection06({ data = [], titleText: initialTitle = "자주 묻는 질�
         />
       )}
 
-      {editingTitle && (
+      {!isPreview && editingTitle && (
         <EditTitleModal
           titleText={titleText}
           subTitleText={subTitleText}

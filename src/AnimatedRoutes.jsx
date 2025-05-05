@@ -153,10 +153,10 @@
 
 
 
-// ✅ AnimateRoutes.jsx (로그인 여부 확인 추가)
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+
 import HomePage from "./views/HomePage";
 import AboutPage from "./views/AboutPage";
 import AssetPage from "./views/AssetPage";
@@ -172,6 +172,8 @@ import AdminPage from "./views/AdminPage";
 import LoginPage from "./views/LoginPage";
 import NaverCallback from "./views/NaverCallback";
 import SignUpSection01 from "./components/TpSection/SignUp";
+import TpPagePreview from "./views/TpPagePreview";
+import ProductDetail from "./components/TpSection/ProductDetail";
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -179,124 +181,71 @@ const pageVariants = {
   exit: { opacity: 0, y: 20, transition: { duration: 0.5 } },
 };
 
+const PageWrapper = ({ children }) => (
+  <motion.main
+    variants={pageVariants}
+    initial="initial"
+    animate="animate"
+    exit="exit"
+  >
+    {children}
+  </motion.main>
+);
+
 function AnimateRoutes({ user, loading, setUser }) {
   const location = useLocation();
 
   return (
-    <>
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route
-            path="/adf"
-            element={
-              <PageWrapper>
-                <HomePage />
-              </PageWrapper>
-            }
-          />
-
-          <Route
-            path="/news"
-            element={
-              <PageWrapper>
-                <NewsPage />
-              </PageWrapper>
-            }
-          />
-
-          <Route
-            path="/productPage01"
-            element={
-              <PageWrapper>
-                <Tpsection08 />
-              </PageWrapper>
-            }
-          />
-          <Route
-            path="/productPage02"
-            element={
-              <PageWrapper>
-                <TpPage02 />
-              </PageWrapper>
-            }
-          />
-          <Route
-            path="/productPage03"
-            element={
-              <PageWrapper>
-                {loading ? (
-                  <div>로딩 중...</div>
-                ) : user ? (
-                  <TpPage03 user={user} />
-                ) : (
-                  <Navigate to="/login" />
-                )}
-              </PageWrapper>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <PageWrapper>
-                <LoginPage setUser={setUser} />              
-              </PageWrapper>
-            }
-          />
-          <Route
-            path="/adm"
-            element={
-              <PageWrapper>
-                {loading ? (
-                  <div>로딩 중...</div> // 또는 Spinner
-                ) : user && user.isAdmin ? (
-                  <AdminPage />
-                ) : (
-                  <Navigate to="/login" />
-                )}
-              </PageWrapper>
-            }
-          />
-          <Route
-            path="/"
-            element={
-              <PageWrapper>
-                <TpPage />
-              </PageWrapper>
-            }
-          />
-          <Route
-            path="/signUp"
-            element={
-              <PageWrapper>
-                <SignUpSection01 />
-              </PageWrapper>
-            }
-          />
-          <Route
-            path="/naver/callback"
-            element={
-              <PageWrapper>
-              <NaverCallback setUser={setUser} />
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname + location.search}>
+        <Route path="/adf" element={<PageWrapper><HomePage /></PageWrapper>} />
+        <Route path="/news" element={<PageWrapper><NewsPage /></PageWrapper>} />
+        <Route path="/productPage01" element={<PageWrapper><Tpsection08 /></PageWrapper>} />
+        <Route path="/productPage02" element={<PageWrapper><TpPage02 /></PageWrapper>} />
+        <Route
+          path="/productPage03"
+          element={
+            <PageWrapper>
+              {loading ? <div>로딩 중...</div> : user ? <TpPage03 user={user} /> : <Navigate to="/login" />}
             </PageWrapper>
-            }
-          />
-        </Routes>
-      </AnimatePresence>
-    </>
+          }
+        />
+        <Route
+          path="/login"
+          element={<PageWrapper><LoginPage setUser={setUser} /></PageWrapper>}
+        />
+        <Route
+          path="/adm"
+          element={
+            <PageWrapper>
+              {loading ? <div>로딩 중...</div> : user && user.isAdmin ? <AdminPage /> : <Navigate to="/login" />}
+            </PageWrapper>
+          }
+        />
+        <Route path="/" element={<PageWrapper><TpPage /></PageWrapper>} />
+        <Route path="/signUp" element={<PageWrapper><SignUpSection01 /></PageWrapper>} />
+
+        {/* ✅ /preview는 header/footer 없이 단독 렌더링 (PageWrapper는 유지) */}
+        <Route
+          path="/preview"
+          element={
+            <motion.div
+              variants={pageVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              style={{ background: "#fff", minHeight: "100vh" }}
+            >
+              <TpPagePreview />
+            </motion.div>
+          }
+        />
+
+        <Route path="/naver/callback" element={<PageWrapper><NaverCallback setUser={setUser} /></PageWrapper>} />
+        <Route path="/product/:id" element={<PageWrapper><ProductDetail /></PageWrapper>} />
+      </Routes>
+    </AnimatePresence>
   );
 }
-
-const PageWrapper = ({ children }) => {
-  return (
-    <motion.main
-      variants={pageVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-    >
-      {children}
-    </motion.main>
-  );
-};
 
 export default AnimateRoutes;

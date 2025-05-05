@@ -1,8 +1,11 @@
 .tpHeader03 {
     position: fixed;
-    width: 100%;
-    z-index: 1000;
-    background-color: #fff;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    z-index: 10000;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     &__container{
       position: relative;
       width: 100%;

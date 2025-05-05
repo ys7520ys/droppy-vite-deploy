@@ -2,7 +2,7 @@ import { React, useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 // import logoImg from "../assets/img/logo.png";
 
-const TpHeader01 = () => {
+const TpHeader01 = ({ navItems = [], ...props }) => {
 	const [menuOpen, setMenuOpen] = useState(false);
 	const openBtnRef = useRef(null);
 	const closeBtnRef = useRef(null);
@@ -31,48 +31,23 @@ const TpHeader01 = () => {
 				</Link>
 				<nav className="tpHeader01__nav" role="navigation">
 					<ul className="tpHeader01__nav-lists">
-						<li className="list">
-							<Link 
-								to="/about" 
-								className="list-link" 
-								aria-label="ABOUT US 페이지로 이동" 
-							>
-								네비1
-							</Link>
-						</li>
-						<li className="list">
-							<Link 
-								to="/asset" 
-								className="list-link" 
-								aria-label="ASSET 페이지로 이동" 
-							>
-								네비2
-							</Link>
-						</li>
-						<li className="list">
-							<Link 
-								to="/news" 
-								className="list-link" 
-								aria-label="NEWS 페이지로 이동" 
-							>
-								네비3
-							</Link>
-						</li>
-						<li className="list">
-							<Link 
-								to="/contactUs" 
-								className="list-link" 
-								aria-label="CONTACT US 페이지로 이동" 
-							>
-								네비4
-							</Link>
-						</li>
+						{navItems.map((item, idx) => (
+							<li className="list" key={idx}>
+								<Link 
+									to={item.link}
+									className="list-link"
+									aria-label={item.label + " 페이지로 이동"}
+								>
+									{item.label}
+								</Link>
+							</li>
+						))}
 					</ul>
 				</nav>
 				<button 
 					aria-expanded={menuOpen} 
 					aria-controls="sideMenu" 
-					aria-label="카테고리 메뉴 닫힘, 메뉴 열기"
+					aria-label="컴포넌트 메뉴 열기"
 					className="tpHeader01__menuBtn" 
 					ref={openBtnRef}
 					onClick={() => { setMenuOpen(!menuOpen) }}
@@ -83,6 +58,13 @@ const TpHeader01 = () => {
 						<li></li>
 					</ul>
 				</button>
+				<button
+					className="tpHeader01__loginBtn"
+					aria-label="로그인"
+					onClick={() => { /* 로그인 동작 추가 */ }}
+				>
+					로그인
+				</button>
 				<nav 
 					className={`tpHeader01__sideMenu ${menuOpen ? "active" : ""}`} 
 					id="sideMenu" 
@@ -90,7 +72,7 @@ const TpHeader01 = () => {
 				>
 					<button 
 						className="tpHeader01__sideMenu-closeBtn" 
-						aria-label="카테고리 메뉴 열림, 메뉴 닫기" 
+						aria-label="컴포넌트 메뉴 닫기" 
 						tabIndex={menuOpen ? "0" : "-1"} 
 						onClick={() => { setMenuOpen(!menuOpen) }}
 						ref={closeBtnRef}
@@ -99,45 +81,15 @@ const TpHeader01 = () => {
 					</button>
 					<ul className="sideMenu__lists" aria-hidden={!menuOpen}>
 						<li className="sideMenu__lists-list">
-							<Link 
-								to="/about" 
-								tabIndex={menuOpen ? "0" : "-1"} 
-								onClick={() => { setMenuOpen(!menuOpen) }}
-								aria-label="ABOUT 페이지로 이동"
-							>
-								네비1
-							</Link>
+							<span>컴포넌트A</span>
 						</li>
 						<li className="sideMenu__lists-list">
-							<Link 
-								to="/asset" 
-								tabIndex={menuOpen ? "0" : "-1"} 
-								onClick={() => { setMenuOpen(!menuOpen) }}
-								aria-label="ASSET 페이지로 이동"
-							>
-								네비2
-							</Link>
+							<span>컴포넌트B</span>
 						</li>
 						<li className="sideMenu__lists-list">
-							<Link 
-								to="/news" 
-								tabIndex={menuOpen ? "0" : "-1"} 
-								onClick={() => { setMenuOpen(!menuOpen) }}
-								aria-label="NEWS 페이지로 이동"
-							>
-								네비3
-							</Link>
+							<span>컴포넌트C</span>
 						</li>
-						<li className="sideMenu__lists-list">
-							<Link 
-								to="/contactUs" 
-								tabIndex={menuOpen ? "0" : "-1"} 
-								onClick={() => { setMenuOpen(!menuOpen) }}
-								aria-label="CONTACTUS 페이지로 이동"
-							>
-								네비4
-							</Link>
-						</li>
+						{/* 실제 컴포넌트 리스트로 교체 가능 */}
 					</ul>
 				</nav>
 

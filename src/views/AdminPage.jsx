@@ -315,7 +315,6 @@
 
 
 
-// ✅ AdminPage.jsx (배너04 + 섹션02/04/06/07 내용 확인 가능)
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
@@ -332,48 +331,55 @@ const AdminPage = () => {
     return () => unsubscribe();
   }, []);
 
-  const renderBanner04Details = (component) => {
-    if (!component) return null;
-    return (
-      <div style={{ marginBottom: "24px" }}>
-        <div style={{ background: "#eef2f6", padding: "10px 14px", borderRadius: "6px", marginBottom: "10px" }}>
-          <strong>🎬 배너04</strong><br />
-          <strong>제목:</strong> {component.title || "(제목 없음)"}<br />
-          <strong>서브제목:</strong> {component.subTitle || "(서브제목 없음)"}<br />
-          <strong>정렬:</strong> {component.align || "기본값"}<br />
-        </div>
-        {component.mediaUrl && (
-          <div>
-            {component.mediaType === "video" ? (
-              <video src={component.mediaUrl} controls style={{ width: "300px", borderRadius: "8px" }} />
-            ) : (
-              <img src={component.mediaUrl} alt="배너 이미지" style={{ width: "300px", borderRadius: "8px" }} />
-            )}
-          </div>
-        )}
+  // ✅ 각 컴포넌트 유형별 상세 렌더링 함수들
+  const renderBanner04Details = (c) => (
+    <div style={{ marginBottom: "24px" }}>
+      <div style={{ background: "#eef2f6", padding: "10px 14px", borderRadius: "6px", marginBottom: "10px" }}>
+        <strong>🎬 배너04</strong><br />
+        <strong>제목:</strong> {c.title || "(제목 없음)"}<br />
+        <strong>서브제목:</strong> {c.subTitle || "(서브제목 없음)"}<br />
+        <strong>정렬:</strong> {c.align || "기본값"}<br />
       </div>
-    );
-  };
+      {c.mediaUrl && (
+        c.mediaType === "video" ? (
+          <video src={c.mediaUrl} controls style={{ width: "300px", borderRadius: "8px" }} />
+        ) : (
+          <img src={c.mediaUrl} alt="배너 이미지" style={{ width: "300px", borderRadius: "8px" }} />
+        )
+      )}
+    </div>
+  );
 
-  const renderSection02Details = (component) => {
-    const title = component.text || "(본문 없음)";
-    const align = component.align || "center";
-    const boxes = Array.isArray(component.boxes) ? component.boxes : [];
+  const renderSection02Details = (c) => (
+    <div style={{ marginBottom: "24px" }}>
+      <div style={{ background: "#eef2f6", padding: 10, borderRadius: "6px", marginBottom: 10 }}>
+        <strong>✅ [섹션02 상단 텍스트]</strong><br />
+        <strong>텍스트:</strong> {c.text?.split('\n').map((t, i) => (<span key={i}>{t}<br /></span>)) || "(없음)"}<br />
+        <strong>정렬:</strong> {c.align || "center"}
+      </div>
+    </div>
+  );
 
+  const renderSection04Details = (c) => {
+    const boxes = Array.isArray(c.boxes) ? c.boxes : [];
     return (
       <div style={{ marginBottom: "24px" }}>
-        <div style={{ background: "#eef2f6", padding: 10, borderRadius: "6px", marginBottom: 10 }}>
-          <strong>✅ [섹션02 상단 텍스트]</strong><br />
-          <strong>텍스트:</strong> {title.split('\n').map((t, i) => (<span key={i}>{t}<br /></span>))}<br />
-          <strong>정렬:</strong> {align === "center" ? "가운데 정렬" : align === "right" ? "오른쪽 정렬" : "왼쪽 정렬"}
+        <div style={{ background: "#eef2f6", padding: 10, marginBottom: 10 }}>
+          <strong>✅ [섹션04 상단 텍스트]</strong><br />
+          <strong>제목:</strong> {c.titleText || "(제목 없음)"}<br />
+          <strong>서브제목:</strong> {c.subTitleText || "(서브제목 없음)"}<br />
+          <strong>정렬:</strong> {c.align || "left"}
         </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {boxes.map((b, i) => (
-            <div key={i} style={{ width: "250px", padding: 10, background: "#f9f9f9", border: "1px solid #ddd", borderRadius: "4px" }}>
-              <strong>02박스 {b.num || i + 1}</strong><br />
-              <strong>제목:</strong><br /> {b.title?.split("\n").map((t, j) => (<span key={j}>{t}<br /></span>))}<br />
-              <strong>설명1:</strong> {b.description1 || "-"}<br />
-              <strong>설명2:</strong> {b.description2 || "-"}
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          {boxes.map((box, i) => (
+            <div key={i} style={{ width: "250px", padding: "10px", background: "#f9f9f9", border: "1px solid #ddd", borderRadius: "4px" }}>
+              <strong>📦 04박스 {i + 1}</strong><br />
+              <span>title: {box.title}</span><br />
+              <span>subtitle: {box.subtitle}</span><br />
+              <span>description: {box.description}</span><br />
+              {box.imageClass?.startsWith("http") && (
+                <img src={box.imageClass} alt="" style={{ width: "100%", marginTop: "8px", borderRadius: "4px" }} />
+              )}
             </div>
           ))}
         </div>
@@ -381,35 +387,15 @@ const AdminPage = () => {
     );
   };
 
-  const renderSection07Details = (component) => {
-    const data = component.data;
-    if (!Array.isArray(data)) return null;
-    return (
-      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-        {data.map((item, i) => (
-          <div key={i} style={{ width: "250px", padding: "10px", background: "#f9f9f9", border: "1px solid #ddd", borderRadius: "4px" }}>
-            <strong>07박스{i + 1}</strong><br />
-            <span>percentage: {item.percentage || 0}%</span><br />
-            <span>label: {item.label || "(없음)"}</span>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  const renderSection06Details = (component) => {
-    const data = component.data || [];
-    const title = component.titleText || "(제목 없음)";
-    const subtitle = component.subTitleText || "(서브제목 없음)";
-    const align = component.align || "left";
-
+  const renderSection06Details = (c) => {
+    const data = c.data || [];
     return (
       <div style={{ marginBottom: "24px" }}>
         <div style={{ background: "#eef2f6", padding: 10, marginBottom: 10 }}>
           <strong>✅ [섹션06 상단 텍스트]</strong><br />
-          <strong>제목:</strong> {title}<br />
-          <strong>서브제목:</strong> {subtitle}<br />
-          <strong>정렬:</strong> {align}
+          <strong>제목:</strong> {c.titleText || "(제목 없음)"}<br />
+          <strong>서브제목:</strong> {c.subTitleText || "(서브제목 없음)"}<br />
+          <strong>정렬:</strong> {c.align || "left"}
         </div>
         <ul>
           {data.map((item, i) => (
@@ -423,40 +409,17 @@ const AdminPage = () => {
     );
   };
 
-  const renderSection04Details = (component) => {
-    const boxes = Array.isArray(component.editedBoxes)
-      ? component.editedBoxes
-      : Array.isArray(component.boxes)
-      ? component.boxes
-      : [];
-
-    const title = component.titleText || "(제목 없음)";
-    const subtitle = component.subTitleText || "(서브제목 없음)";
-    const align = component.textAlign || component.align || "left";
-
+  const renderSection07Details = (c) => {
+    const data = c.data || [];
     return (
-      <div style={{ marginBottom: "24px" }}>
-        <div style={{ background: "#eef2f6", padding: 10, marginBottom: 10 }}>
-          <strong>✅ [섹션04 상단 텍스트]</strong><br />
-          <strong>제목:</strong> {title}<br />
-          <strong>서브제목:</strong> {subtitle}<br />
-          <strong>정렬:</strong> {align}
-        </div>
-        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-          {boxes.map((box, i) => (
-            <div key={i} style={{ width: "250px", padding: "10px", background: "#f9f9f9", border: "1px solid #ddd", borderRadius: "4px" }}>
-              <strong>📦 04박스 {i + 1}</strong><br />
-              <span>title: {box.title || "(없음)"}</span><br />
-              <span>subtitle: {box.subtitle || "(없음)"}</span><br />
-              <span>description: {box.description || "(없음)"}</span><br />
-              {box.imageClass?.startsWith("http") && (
-                <div style={{ marginTop: "6px" }}>
-                  <img src={box.imageClass} alt={`박스${i + 1} 이미지`} style={{ width: "80px", borderRadius: "4px", border: "1px solid #ccc" }} />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+        {data.map((item, i) => (
+          <div key={i} style={{ width: "250px", padding: "10px", background: "#f9f9f9", border: "1px solid #ddd", borderRadius: "4px" }}>
+            <strong>07박스{i + 1}</strong><br />
+            <span>percentage: {item.percentage || 0}%</span><br />
+            <span>label: {item.label || "(없음)"}</span>
+          </div>
+        ))}
       </div>
     );
   };
@@ -492,19 +455,24 @@ const AdminPage = () => {
                 <td style={tdStyle}>{order.user?.email}</td>
                 <td style={tdStyle}>
                   <ul style={{ paddingLeft: 16 }}>
-                    {order.components?.map((c, i) => (
+                    {order.pages?.flatMap((p) => p.components)?.map((c, i) => (
                       <li key={i}>{c.type}</li>
                     ))}
                   </ul>
                 </td>
                 <td style={tdStyle}>
-                  {order.components?.map((c, i) => (
-                    <div key={i} style={{ marginBottom: "16px" }}>
-                      {c.type === "배너04" && renderBanner04Details(c)}
-                      {c.type === "섹션02" && renderSection02Details(c)}
-                      {c.type === "섹션04" && renderSection04Details(c)}
-                      {c.type === "섹션06" && renderSection06Details(c)}
-                      {c.type === "섹션07" && renderSection07Details(c)}
+                  {order.pages?.map((page, pageIndex) => (
+                    <div key={pageIndex} style={{ marginBottom: "24px" }}>
+                      <h3 style={{ marginBottom: "10px", color: "#222" }}>📄 페이지 {pageIndex + 1}</h3>
+                      {page.components?.map((c, i) => (
+                        <div key={i}>
+                          {c.type === "배너04" && renderBanner04Details(c)}
+                          {c.type === "섹션02" && renderSection02Details(c)}
+                          {c.type === "섹션04" && renderSection04Details(c)}
+                          {c.type === "섹션06" && renderSection06Details(c)}
+                          {c.type === "섹션07" && renderSection07Details(c)}
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </td>
@@ -537,4 +505,5 @@ const tdStyle = {
 };
 
 export default AdminPage;
+
 

@@ -1,1376 +1,17 @@
-// import React, { useState } from "react";
-// import { DndProvider, useDrag, useDrop } from "react-dnd";
-// import { HTML5Backend } from "react-dnd-html5-backend";
-
-// import TpBanner04 from "../components/TpBanner/TpBanner04";
-// import Tpsection04 from "../components/TpSection/TpSection04";
-// import Tpsection02 from "../components/TpSection/TpSection02";
-// import Tpsection07 from "../components/TpSection/TpSection07";
-
-// // 컴포넌트 매핑 테이블
-// const componentMap = {
-//   text: <TpBanner04 />,
-//   text2: <Tpsection02 />,
-//   button: <Tpsection04 />,
-//   button2: <Tpsection07 />,
-// };
-
-// // HTML 문자열로 변환 (간단한 예시 버전)
-// const componentToHTML = (type) => {
-//   switch (type) {
-//     case "text":
-//       return `<section><h2>텍스트 영역입니다</h2></section>`;
-//     case "button":
-//       return `<section><button>버튼입니다</button></section>`;
-//     case "button2":
-//       return `<section><div>고객 만족도 차트</div></section>`;
-//     case "text2":
-//       return `<section><p>텍스트2 내용</p></section>`;
-//     default:
-//       return "";
-//   }
-// };
-
-// // 드래그 아이템
-// const ComponentItem = ({ type, label }) => {
-//   const [, dragRef] = useDrag(() => ({
-//     type: "COMPONENT",
-//     item: { type },
-//   }));
-
-//   return (
-//     <div
-//       ref={dragRef}
-//       style={{
-//         background: "#eee",
-//         padding: "8px",
-//         marginBottom: "8px",
-//         cursor: "grab",
-//       }}
-//     >
-//       {label}
-//     </div>
-//   );
-// };
-
-// // 드롭영역 + 출력
-// const DropCanvas = ({ onDrop, components, onDelete }) => {
-//   const DropZone = ({ index }) => {
-//     const [{ isOver }, dropRef] = useDrop(() => ({
-//       accept: "COMPONENT",
-//       drop: (item) => onDrop(item, index),
-//       collect: (monitor) => ({
-//         isOver: monitor.isOver(),
-//       }),
-//     }));
-
-//     return (
-//       <div
-//         ref={dropRef}
-//         style={{
-//           height: "40px",
-//           backgroundColor: isOver ? "#fff" : "transparent",
-//           border: "2px dashed #fff",
-//           margin: "10px 0",
-//           transition: "background-color 0.3s",
-//         }}
-//       />
-//     );
-//   };
-
-//   return (
-//     <div
-//       id="drop-area"
-//       style={{
-//         flex: 1,
-//         backgroundColor: "#222222",
-//         border: "2px dashed #ccc",
-//         minHeight: "400px",
-//         padding: "0px 20px",
-//       }}
-//     >
-//       {components.length === 0 ? (
-//         <DropZone index={0} />
-//       ) : (
-//         components.map((c, i) => (
-//           <React.Fragment key={i}>
-//             <DropZone index={i} />
-//             <div
-//               style={{
-//                 position: "relative",
-//                 marginBottom: "20px",
-//                 border: "2px dashed white",
-//               }}
-//             >
-//               {componentMap[c.type]}
-//               <button
-//                 onClick={() => onDelete(i)}
-//                 style={{
-//                   position: "absolute",
-//                   top: "10px",
-//                   right: "10px",
-//                   backgroundColor: "#ff4d4f",
-//                   color: "#fff",
-//                   border: "none",
-//                   padding: "12px 25px",
-//                   borderRadius: "4px",
-//                   cursor: "pointer",
-//                   zIndex: "1000",
-//                   fontSize: "20px",
-//                   fontWeight: "600",
-//                 }}
-//               >
-//                 삭제
-//               </button>
-//             </div>
-//           </React.Fragment>
-//         ))
-//       )}
-//       <DropZone index={components.length} />
-//     </div>
-//   );
-// };
-
-// // 메인 페이지
-// const TpPage03 = () => {
-//   const [droppedComponents, setDroppedComponents] = useState([]);
-
-//   const handleDrop = (item, index) => {
-//     setDroppedComponents((prev) => {
-//       const newComponents = [...prev];
-//       newComponents.splice(index, 0, item);
-//       return newComponents;
-//     });
-//   };
-
-//   const handleDelete = (indexToRemove) => {
-//     setDroppedComponents((prev) =>
-//       prev.filter((_, index) => index !== indexToRemove)
-//     );
-//   };
-
-//   const handleBuild = () => {
-//     const htmlBody = droppedComponents
-//       .map((comp) => componentToHTML(comp.type))
-//       .join("\n");
-
-//     const fullHTML = `
-//       <!DOCTYPE html>
-//       <html lang="ko">
-//       <head>
-//         <meta charset="UTF-8" />
-//         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-//         <title>완성된 페이지</title>
-//         <style>
-//           body { font-family: sans-serif; padding: 40px; background: #f9f9f9; }
-//           section { padding: 30px; margin-bottom: 20px; border: 1px solid #ddd; background: white; }
-//         </style>
-//       </head>
-//       <body>
-//         ${htmlBody}
-//       </body>
-//       </html>
-//     `;
-
-//     const preview = window.open();
-//     preview.document.write(fullHTML);
-//     preview.document.close();
-//   };
-
-//   return (
-//     <DndProvider backend={HTML5Backend}>
-//       <div
-//         style={{
-//           backgroundColor: "#222222",
-//           padding: "300px 0px",
-//           width: "100%",
-//         }}
-//       >
-//         {/* 사이드 고정 메뉴 */}
-//         <div
-//           style={{
-//             zIndex: "1000",
-//             width: "200px",
-//             margin: "0 auto",
-//             color: "#fff",
-//             position: "fixed",
-//             top: "100px",
-//             right: "100px",
-//           }}
-//         >
-//           <h4 style={{ marginBottom: "16px" }}>🧩 컴포넌트 목록</h4>
-//           <ComponentItem type="text" label="텍스트" />
-//           <ComponentItem type="button" label="버튼" />
-//           <ComponentItem type="button2" label="버튼2" />
-//           <ComponentItem type="text2" label="텍스트2" />
-//           <button
-//             onClick={handleBuild}
-//             style={{
-//               marginTop: "20px",
-//               width: "100%",
-//               padding: "12px 10px",
-//               backgroundColor: "#4caf50",
-//               color: "#fff",
-//               fontSize: "16px",
-//               fontWeight: "bold",
-//               border: "none",
-//               borderRadius: "6px",
-//               cursor: "pointer",
-//             }}
-//           >
-//             ✅ 완성하기
-//           </button>
-//         </div>
-
-//         {/* 드래그 Drop 영역 */}
-//         <DropCanvas
-//           onDrop={handleDrop}
-//           components={droppedComponents}
-//           onDelete={handleDelete}
-//         />
-//       </div>
-//     </DndProvider>
-//   );
-// };
-
-// export default TpPage03;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React, { useState } from "react";
-// import { DndProvider, useDrag, useDrop } from "react-dnd";
-// import { HTML5Backend } from "react-dnd-html5-backend";
-// import { saveAs } from "file-saver";
-
-// import TpBanner04 from "../components/TpBanner/TpBanner04";
-// import Tpsection04 from "../components/TpSection/TpSection04";
-// import Tpsection02 from "../components/TpSection/TpSection02";
-// import Tpsection07 from "../components/TpSection/TpSection07";
-
-// // 💡 HTML 변환 함수 (판매용 정적 HTML용)
-// const componentToHTML = (type) => {
-//   switch (type) {
-//     case "text":
-//       return `<section><h2 style="font-size:32px;">Hero 텍스트입니다</h2></section>`;
-//     case "text2":
-//       return `<section><p style="font-size:20px;">서브 텍스트입니다</p></section>`;
-//     case "button":
-//       return `<section><button style="background:#333;color:#fff;padding:10px 20px;">버튼입니다</button></section>`;
-//     case "button2":
-//       return `<section><div style="font-size:24px;">고객 만족도 차트 (디자인 요소)</div></section>`;
-//     default:
-//       return "";
-//   }
-// };
-
-// // 컴포넌트 매핑 테이블 (React 내부 렌더링용)
-// const componentMap = {
-//   text: <TpBanner04 />,
-//   text2: <Tpsection02 />,
-//   button: <Tpsection04 />,
-//   button2: <Tpsection07 />,
-// };
-
-// // 드래그 컴포넌트 항목
-// const ComponentItem = ({ type, label }) => {
-//   const [, dragRef] = useDrag(() => ({
-//     type: "COMPONENT",
-//     item: { type },
-//   }));
-
-//   return (
-//     <div
-//       ref={dragRef}
-//       style={{
-//         background: "#eee",
-//         padding: "8px",
-//         marginBottom: "8px",
-//         cursor: "grab",
-//       }}
-//     >
-//       {label}
-//     </div>
-//   );
-// };
-
-// // 드롭 영역 + 사이에 삽입 가능한 DropZone 포함
-// const DropCanvas = ({ onDrop, components, onDelete }) => {
-//   const DropZone = ({ index }) => {
-//     const [{ isOver }, dropRef] = useDrop(() => ({
-//       accept: "COMPONENT",
-//       drop: (item) => onDrop(item, index),
-//       collect: (monitor) => ({
-//         isOver: monitor.isOver(),
-//       }),
-//     }));
-
-//     return (
-//       <div
-//         ref={dropRef}
-//         style={{
-//           height: "40px",
-//           backgroundColor: isOver ? "#fff" : "transparent",
-//           border: "2px dashed #fff",
-//           margin: "10px 0",
-//           transition: "background-color 0.3s",
-//         }}
-//       />
-//     );
-//   };
-
-//   return (
-//     <div
-//       id="drop-area"
-//       style={{
-//         flex: 1,
-//         backgroundColor: "#222222",
-//         border: "2px dashed #ccc",
-//         minHeight: "400px",
-//         padding: "0px 20px",
-//       }}
-//     >
-//       {components.length === 0 ? (
-//         <DropZone index={0} />
-//       ) : (
-//         components.map((c, i) => (
-//           <React.Fragment key={i}>
-//             <DropZone index={i} />
-//             <div
-//               style={{
-//                 position: "relative",
-//                 marginBottom: "20px",
-//                 border: "2px dashed white",
-//               }}
-//             >
-//               {componentMap[c.type]}
-//               <button
-//                 onClick={() => onDelete(i)}
-//                 style={{
-//                   position: "absolute",
-//                   top: "10px",
-//                   right: "10px",
-//                   backgroundColor: "#ff4d4f",
-//                   color: "#fff",
-//                   border: "none",
-//                   padding: "12px 25px",
-//                   borderRadius: "4px",
-//                   cursor: "pointer",
-//                   zIndex: "1000",
-//                   fontSize: "20px",
-//                   fontWeight: "600",
-//                 }}
-//               >
-//                 삭제
-//               </button>
-//             </div>
-//           </React.Fragment>
-//         ))
-//       )}
-//       <DropZone index={components.length} />
-//     </div>
-//   );
-// };
-
-// // 메인 페이지
-// const TpPage03 = () => {
-//   const [droppedComponents, setDroppedComponents] = useState([]);
-
-//   const handleDrop = (item, index) => {
-//     setDroppedComponents((prev) => {
-//       const newComponents = [...prev];
-//       newComponents.splice(index, 0, item);
-//       return newComponents;
-//     });
-//   };
-
-//   const handleDelete = (indexToRemove) => {
-//     setDroppedComponents((prev) =>
-//       prev.filter((_, index) => index !== indexToRemove)
-//     );
-//   };
-
-//   const handleBuild = () => {
-//     const htmlBody = droppedComponents
-//       .map((comp) => componentToHTML(comp.type))
-//       .join("\n");
-
-//     const fullHTML = `
-//       <!DOCTYPE html>
-//       <html lang="ko">
-//       <head>
-//         <meta charset="UTF-8" />
-//         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-//         <title>완성된 페이지</title>
-//         <style>
-//           body { font-family: sans-serif; padding: 40px; background: #f9f9f9; }
-//           section { padding: 30px; margin-bottom: 20px; border: 1px solid #ddd; background: white; }
-//           button { padding: 10px 20px; background: #4caf50; color: white; border: none; }
-//         </style>
-//       </head>
-//       <body>
-//         ${htmlBody}
-//       </body>
-//       </html>
-//     `;
-
-//     const blob = new Blob([fullHTML], { type: "text/html;charset=utf-8" });
-//     saveAs(blob, "my-template.html");
-//   };
-
-//   return (
-//     <DndProvider backend={HTML5Backend}>
-//       <div
-//         style={{
-//           backgroundColor: "#222222",
-//           padding: "300px 0px",
-//           width: "100%",
-//         }}
-//       >
-//         {/* 우측 고정된 컴포넌트 목록 */}
-//         <div
-//           style={{
-//             zIndex: "1000",
-//             width: "200px",
-//             color: "#fff",
-//             position: "fixed",
-//             top: "100px",
-//             right: "100px",
-//           }}
-//         >
-//           <h4 style={{ marginBottom: "16px" }}>🧩 컴포넌트 목록</h4>
-//           <ComponentItem type="text" label="텍스트" />
-//           <ComponentItem type="button" label="버튼" />
-//           <ComponentItem type="button2" label="버튼2" />
-//           <ComponentItem type="text2" label="텍스트2" />
-//           <button
-//             onClick={handleBuild}
-//             style={{
-//               marginTop: "20px",
-//               width: "100%",
-//               padding: "12px 10px",
-//               backgroundColor: "#4caf50",
-//               color: "#fff",
-//               fontSize: "16px",
-//               fontWeight: "bold",
-//               border: "none",
-//               borderRadius: "6px",
-//               cursor: "pointer",
-//             }}
-//           >
-//             ✅ 완성하기 (HTML 다운로드)
-//           </button>
-//         </div>
-
-//         {/* 컴포넌트 드롭 영역 */}
-//         <DropCanvas
-//           onDrop={handleDrop}
-//           components={droppedComponents}
-//           onDelete={handleDelete}
-//         />
-//       </div>
-//     </DndProvider>
-//   );
-// };
-
-// export default TpPage03;
-
-
-// 🔥 Firestore 저장 기능 추가된 TpPage03
-// import React, { useState } from "react";
-// import { DndProvider, useDrag, useDrop } from "react-dnd";
-// import { HTML5Backend } from "react-dnd-html5-backend";
-// import { saveAs } from "file-saver";
-// import { db } from "../firebase"; // ✅ firebase.js에서 db 불러오기
-// import { collection, addDoc } from "firebase/firestore";
-
-// import TpBanner04 from "../components/TpBanner/TpBanner04";
-// import Tpsection04 from "../components/TpSection/TpSection04";
-// import Tpsection02 from "../components/TpSection/TpSection02";
-// import Tpsection07 from "../components/TpSection/TpSection07";
-
-// const componentToHTML = (type) => {
-//   switch (type) {
-//     case "배너04":
-//       return `<section><h2 style="font-size:32px;">Hero 텍스트입니다</h2></section>`;
-//     case "섹션02":
-//       return `<section><p style="font-size:20px;">서브 텍스트입니다</p></section>`;
-//     case "섹션04":
-//       return `<section><button style="background:#333;color:#fff;padding:10px 20px;">버튼입니다</button></section>`;
-//     case "섹션07":
-//       return `<section><div style="font-size:24px;">고객 만족도 차트 (디자인 요소)</div></section>`;
-//     default:
-//       return "";
-//   }
-// };
-
-// const componentMap = {
-//   배너04: <TpBanner04 />, 섹션02: <Tpsection02 />, 섹션04: <Tpsection04 />, 섹션07: <Tpsection07 />,
-// };
-
-// const ComponentItem = ({ type, label }) => {
-//   const [, dragRef] = useDrag(() => ({ type: "COMPONENT", item: { type } }));
-//   return <div ref={dragRef} style={{ background: "#eee", padding: "8px", marginBottom: "8px", cursor: "grab" }}>{label}</div>;
-// };
-
-// const DropCanvas = ({ onDrop, components, onDelete }) => {
-//   const DropZone = ({ index }) => {
-//     const [{ isOver }, dropRef] = useDrop(() => ({
-//       accept: "COMPONENT",
-//       drop: (item) => onDrop(item, index),
-//       collect: (monitor) => ({ isOver: monitor.isOver() }),
-//     }));
-
-//     return <div ref={dropRef} style={{ height: "40px", backgroundColor: isOver ? "#fff" : "transparent", border: "2px dashed #fff", margin: "10px 0" }} />;
-//   };
-
-//   return (
-//     <div id="drop-area" style={{ flex: 1, backgroundColor: "#222222", border: "2px dashed #ccc", minHeight: "400px", padding: "0px 20px" }}>
-//       {components.length === 0 ? <DropZone index={0} /> : components.map((c, i) => (
-//         <React.Fragment key={i}>
-//           <DropZone index={i} />
-//           <div style={{ position: "relative", marginBottom: "20px", border: "2px dashed white" }}>
-//             {componentMap[c.type]}
-//             <button onClick={() => onDelete(i)} style={{ position: "absolute", top: "10px", right: "10px", backgroundColor: "#ff4d4f", color: "#fff", border: "none", padding: "12px 25px", borderRadius: "4px", cursor: "pointer", zIndex: "1000", fontSize: "20px", fontWeight: "600" }}>삭제</button>
-//           </div>
-//         </React.Fragment>
-//       ))}
-//       <DropZone index={components.length} />
-//     </div>
-//   );
-// };
-
-// const TpPage03 = () => {
-//   const [droppedComponents, setDroppedComponents] = useState([]);
-//   const [email, setEmail] = useState("");
-//   const [name, setName] = useState("");
-
-//   const handleDrop = (item, index) => {
-//     setDroppedComponents((prev) => {
-//       const newComponents = [...prev];
-//       newComponents.splice(index, 0, item);
-//       return newComponents;
-//     });
-//   };
-
-//   const handleDelete = (indexToRemove) => {
-//     setDroppedComponents((prev) => prev.filter((_, index) => index !== indexToRemove));
-//   };
-
-//   const handleSubmitOrder = async () => {
-//     if (!email || !name) {
-//       alert("이름과 이메일을 입력해주세요.");
-//       return;
-//     }
-
-//     try {
-//       await addDoc(collection(db, "orders"), {
-//         user: { name, email },
-//         components: droppedComponents
-//       });
-//       alert("주문이 성공적으로 저장되었습니다!");
-//     } catch (error) {
-//       console.error("저장 실패:", error);
-//       alert("문제가 발생했습니다. 다시 시도해주세요.");
-//     }
-//   };
-
-//   const handleBuild = () => {
-//     const htmlBody = droppedComponents.map((comp) => componentToHTML(comp.type)).join("\n");
-//     const fullHTML = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>완성된 페이지</title><style>body{font-family:sans-serif;padding:40px;background:#f9f9f9;}section{padding:30px;margin-bottom:20px;border:1px solid #ddd;background:white;}button{padding:10px 20px;background:#4caf50;color:white;border:none;}</style></head><body>${htmlBody}</body></html>`;
-//     const blob = new Blob([fullHTML], { type: "text/html;charset=utf-8" });
-//     saveAs(blob, "my-template.html");
-//   };
-
-//   return (
-//     <DndProvider backend={HTML5Backend}>
-//       <div style={{ backgroundColor: "#222222", padding: "300px 0px", width: "100%" }}>
-//         <div style={{ zIndex: "1000", width: "240px", color: "black", position: "fixed", top: "100px", right: "100px" }}>
-//           <h4 style={{ marginBottom: "16px" }}>🧩 컴포넌트 목록</h4>
-//           <ComponentItem type="배너04" label="(배너04)"/>
-//           <ComponentItem type="섹션02" label="(섹션02)" />
-//           <ComponentItem type="섹션04" label="(섹션04)" />
-//           <ComponentItem type="섹션07" label="(섹션07)" />
-
-//           <div style={{ marginTop: "20px" }}>
-//             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름 입력" style={{ width: "100%", padding: "8px", marginBottom: "8px" }} />
-//             <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일 입력" style={{ width: "100%", padding: "8px" }} />
-//           </div>
-
-//           <button onClick={handleSubmitOrder} style={{ marginTop: "10px", width: "100%", padding: "12px 10px", backgroundColor: "#2196f3", color: "#fff", fontSize: "16px", fontWeight: "bold", border: "none", borderRadius: "6px", cursor: "pointer" }}>📤 주문하기 (Firestore 저장)</button>
-
-//           <button onClick={handleBuild} style={{ marginTop: "10px", width: "100%", padding: "12px 10px", backgroundColor: "#4caf50", color: "#fff", fontSize: "16px", fontWeight: "bold", border: "none", borderRadius: "6px", cursor: "pointer" }}>✅ HTML 다운로드</button>
-//         </div>
-
-//         <DropCanvas onDrop={handleDrop} components={droppedComponents} onDelete={handleDelete} />
-//       </div>
-//     </DndProvider>
-//   );
-// };
-
-// export default TpPage03;
-
-
-
-
-
-
-
-
-// // ✅ TpPage03 전체 코드: 컴포넌트 클릭 시 수정 가능 + 수정 내용 Firestore 저장
-// import React, { useState } from "react";
-// import { DndProvider, useDrag, useDrop } from "react-dnd";
-// import { HTML5Backend } from "react-dnd-html5-backend";
-// import { saveAs } from "file-saver";
-// import { db } from "../firebase";
-// import { collection, addDoc } from "firebase/firestore";
-
-// import TpBanner04 from "../components/TpBanner/TpBanner04";
-// import Tpsection04 from "../components/TpSection/TpSection04";
-// import Tpsection02 from "../components/TpSection/TpSection02";
-// import Tpsection07 from "../components/TpSection/TpSection07";
-
-// const componentToHTML = (comp) => {
-//   const text = comp.text || "텍스트입니다";
-//   const imgTag = comp.img ? `<img src='${comp.img}' alt='' />` : "";
-
-//   switch (comp.type) {
-//     case "배너04":
-//       return `<section><h2>${text}</h2>${imgTag}</section>`;
-//     case "섹션02":
-//       return `<section><p>${text}</p>${imgTag}</section>`;
-//     case "섹션04":
-//       return `<section><button>${text}</button>${imgTag}</section>`;
-//     case "섹션07":
-//       return `<section><div>${text}</div>${imgTag}</section>`;
-//     default:
-//       return "";
-//   }
-// };
-
-// const componentMap = {
-//   배너04: TpBanner04,
-//   섹션02: Tpsection02,
-//   섹션04: Tpsection04,
-//   섹션07: Tpsection07,
-// };
-
-// const ComponentItem = ({ type, label }) => {
-//   const [, dragRef] = useDrag(() => ({ type: "COMPONENT", item: { type } }));
-//   return <div ref={dragRef} style={{ background: "#eee", padding: 8, marginBottom: 8 }}>{label}</div>;
-// };
-
-// const DropCanvas = ({ components, onDrop, onDelete, onEdit }) => {
-//   const DropZone = ({ index }) => {
-//     const [{ isOver }, dropRef] = useDrop(() => ({
-//       accept: "COMPONENT",
-//       drop: (item) => onDrop(item, index),
-//       collect: (monitor) => ({ isOver: monitor.isOver() }),
-//     }));
-//     return <div ref={dropRef} style={{ height: 40, border: "2px dashed #fff", margin: "10px 0", background: isOver ? "#444" : "transparent" }} />;
-//   };
-
-//   return (
-//     <div style={{ flex: 1, padding: "0 20px", background: "#222", minHeight: 400 }}>
-//       {components.map((comp, i) => {
-//         const Comp = componentMap[comp.type];
-//         return (
-//           <React.Fragment key={i}>
-//             <DropZone index={i} />
-//             <div style={{ border: "2px dashed white", marginBottom: 20, position: "relative" }}>
-//               <Comp
-//                 text={comp.text}
-//                 img={comp.img}
-//                 onEdit={(newData) => onEdit(i, newData)}
-//               />
-//               <button
-//                 onClick={() => onDelete(i)}
-//                 style={{ position: "absolute", top: 10, right: 10, background: "#f33", color: "#fff", border: "none", padding: "8px 16px", cursor: "pointer" }}
-//               >
-//                 삭제
-//               </button>
-//             </div>
-//           </React.Fragment>
-//         );
-//       })}
-//       <DropZone index={components.length} />
-//     </div>
-//   );
-// };
-
-// function TpPage03() {
-//   const [droppedComponents, setDroppedComponents] = useState([]);
-//   const [email, setEmail] = useState("");
-//   const [name, setName] = useState("");
-
-//   const handleDrop = (item, index) => {
-//     const newItem = { ...item, text: "", img: "" }; // 기본값 설정
-//     setDroppedComponents((prev) => {
-//       const newComponents = [...prev];
-//       newComponents.splice(index, 0, newItem);
-//       return newComponents;
-//     });
-//   };
-
-//   const handleEdit = (index, newData) => {
-//     setDroppedComponents((prev) =>
-//       prev.map((c, i) => (i === index ? { ...c, ...newData } : c))
-//     );
-//   };
-
-//   const handleDelete = (index) => {
-//     setDroppedComponents((prev) => prev.filter((_, i) => i !== index));
-//   };
-
-//   const handleSubmitOrder = async () => {
-//     if (!email || !name) return alert("이름과 이메일을 입력해주세요.");
-//     try {
-//       await addDoc(collection(db, "orders"), {
-//         user: { name, email },
-//         components: droppedComponents,
-//       });
-//       alert("주문이 저장되었습니다!");
-//     } catch (err) {
-//       alert("저장 실패: " + err.message);
-//     }
-//   };
-
-//   const handleBuild = () => {
-//     const htmlBody = droppedComponents.map((c) => componentToHTML(c)).join("\n");
-//     const html = `<!DOCTYPE html><html><head><meta charset='UTF-8'><title>템플릿</title></head><body>${htmlBody}</body></html>`;
-//     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-//     saveAs(blob, "template.html");
-//   };
-
-//   return (
-//     <DndProvider backend={HTML5Backend}>
-//       <div style={{ padding: "200px 0", background: "#222" }}>
-//         <div style={{ width: 240, position: "fixed", top: 100, right: 100, background: "#f4f4f4", padding: 20 }}>
-//           <h4>🧩 컴포넌트 목록</h4>
-//           <ComponentItem type="배너04" label="배너04" />
-//           <ComponentItem type="섹션02" label="섹션02" />
-//           <ComponentItem type="섹션04" label="섹션04" />
-//           <ComponentItem type="섹션07" label="섹션07" />
-
-//           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" style={{ width: "100%", marginTop: 20 }} />
-//           <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" style={{ width: "100%", marginTop: 10 }} />
-
-//           <button onClick={handleSubmitOrder} style={{ marginTop: 16, width: "100%" }}>📤 Firestore 저장</button>
-//           <button onClick={handleBuild} style={{ marginTop: 8, width: "100%" }}>💾 HTML 다운로드</button>
-//         </div>
-
-//         <DropCanvas
-//           components={droppedComponents}
-//           onDrop={handleDrop}
-//           onDelete={handleDelete}
-//           onEdit={handleEdit}
-//         />
-//       </div>
-//     </DndProvider>
-//   );
-// }
-
-// export default TpPage03;
-// TpPage03.jsx - 컴포넌트 드래그, 수정 및 Firestore 저장 전체 구현
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React, { useState } from "react";
-// import { DndProvider, useDrag, useDrop } from "react-dnd";
-// import { HTML5Backend } from "react-dnd-html5-backend";
-// import { saveAs } from "file-saver";
-// import { db } from "../firebase";
-// import { collection, addDoc } from "firebase/firestore";
-
-// import TpBanner04 from "../components/TpBanner/TpBanner04";
-// import Tpsection04 from "../components/TpSection/TpSection04";
-// import Tpsection02 from "../components/TpSection/TpSection02";
-// import Tpsection07 from "../components/TpSection/TpSection07";
-
-// const componentToHTML = (comp) => {
-//   const text = comp.text || "텍스트입니다";
-//   const imgTag = comp.img ? `<img src='${comp.img}' alt='' />` : "";
-
-//   switch (comp.type) {
-//     case "배너04": return `<section><h2>${text}</h2>${imgTag}</section>`;
-//     case "섹션02": return `<section><p>${text}</p>${imgTag}</section>`;
-//     case "섹션04": return `<section><button>${text}</button>${imgTag}</section>`;
-//     case "섹션07": return `<section><div>${text}</div>${imgTag}</section>`;
-//     default: return "";
-//   }
-// };
-
-// const componentMap = {
-//   배너04: TpBanner04,
-//   섹션02: Tpsection02,
-//   섹션04: Tpsection04,
-//   섹션07: Tpsection07,
-// };
-
-// const ComponentItem = ({ type, label }) => {
-//   const [, dragRef] = useDrag(() => ({ type: "COMPONENT", item: { type } }));
-//   return <div ref={dragRef} style={{ background: "#eee", padding: 8, marginBottom: 8 }}>{label}</div>;
-// };
-
-// const DropCanvas = ({ components, onDrop, onDelete, onEdit }) => {
-//   const DropZone = ({ index }) => {
-//     const [{ isOver }, dropRef] = useDrop(() => ({
-//       accept: "COMPONENT",
-//       drop: (item) => onDrop(item, index),
-//       collect: (monitor) => ({ isOver: monitor.isOver() }),
-//     }));
-//     return <div ref={dropRef} style={{ height: 40, border: "2px dashed #fff", margin: "10px 0", background: isOver ? "#444" : "transparent" }} />;
-//   };
-
-//   return (
-//     <div style={{ flex: 1, padding: "0 20px", background: "#222", minHeight: 400 }}>
-//       {components.map((comp, i) => {
-//         const Comp = componentMap[comp.type];
-//         return (
-//           <React.Fragment key={i}>
-//             <DropZone index={i} />
-//             <div style={{ border: "2px dashed white", marginBottom: 20, position: "relative" }}>
-//               <Comp
-//                 text={comp.text}
-//                 img={comp.img}
-//                 onEdit={(newData) => onEdit(i, newData)}
-//               />
-//               <button
-//                 onClick={() => onDelete(i)}
-//                 style={{ position: "absolute", top: 10, right: 10, background: "#f33", color: "#fff", border: "none", padding: "8px 16px", cursor: "pointer" }}
-//               >
-//                 삭제
-//               </button>
-//             </div>
-//           </React.Fragment>
-//         );
-//       })}
-//       <DropZone index={components.length} />
-//     </div>
-//   );
-// };
-
-// function TpPage03() {
-//   const [droppedComponents, setDroppedComponents] = useState([]);
-//   const [email, setEmail] = useState("");
-//   const [name, setName] = useState("");
-
-//   const handleDrop = (item, index) => {
-//     const newItem = { ...item, text: "", img: "" }; // 기본값 설정
-//     setDroppedComponents((prev) => {
-//       const newComponents = [...prev];
-//       newComponents.splice(index, 0, newItem);
-//       return newComponents;
-//     });
-//   };
-
-//   const handleEdit = (index, newData) => {
-//     setDroppedComponents((prev) =>
-//       prev.map((c, i) => (i === index ? { ...c, ...newData } : c))
-//     );
-//   };
-
-//   const handleDelete = (index) => {
-//     setDroppedComponents((prev) => prev.filter((_, i) => i !== index));
-//   };
-
-//   const handleSubmitOrder = async () => {
-//     if (!email || !name) return alert("이름과 이메일을 입력해주세요.");
-//     try {
-//       await addDoc(collection(db, "orders"), {
-//         user: { name, email },
-//         components: droppedComponents,
-//       });
-//       alert("주문이 저장되었습니다!");
-//     } catch (err) {
-//       alert("저장 실패: " + err.message);
-//     }
-//   };
-
-//   const handleBuild = () => {
-//     const htmlBody = droppedComponents.map((c) => componentToHTML(c)).join("\n");
-//     const html = `<!DOCTYPE html><html><head><meta charset='UTF-8'><title>템플릿</title></head><body>${htmlBody}</body></html>`;
-//     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-//     saveAs(blob, "template.html");
-//   };
-
-//   return (
-//     <DndProvider backend={HTML5Backend}>
-//       <div style={{ padding: "200px 0", background: "#222", zIndex: "1000" }}>
-//         <div style={{ width: 240, position: "fixed", top: 100, right: 100, background: "#f4f4f4", padding: 20 }}>
-//           <h4>🧩 컴포넌트 목록</h4>
-//           <ComponentItem type="배너04" label="배너04" />
-//           <ComponentItem type="섹션02" label="섹션02" />
-//           <ComponentItem type="섹션04" label="섹션04" />
-//           <ComponentItem type="섹션07" label="섹션07" />
-
-//           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" style={{ width: "100%", marginTop: 20 }} />
-//           <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" style={{ width: "100%", marginTop: 10 }} />
-
-//           <button onClick={handleSubmitOrder} style={{ marginTop: 16, width: "100%" }}>📤 Firestore 저장</button>
-//           <button onClick={handleBuild} style={{ marginTop: 8, width: "100%" }}>💾 HTML 다운로드</button>
-//         </div>
-
-//         <DropCanvas
-//           components={droppedComponents}
-//           onDrop={handleDrop}
-//           onDelete={handleDelete}
-//           onEdit={handleEdit}
-//         />
-//       </div>
-//     </DndProvider>
-//   );
-// }
-
-// export default TpPage03;
-
-
-
-
-
-
-
-
-
-
-// import React, { useState } from "react";
-// import { DndProvider, useDrag, useDrop } from "react-dnd";
-// import { HTML5Backend } from "react-dnd-html5-backend";
-// import { saveAs } from "file-saver";
-// import { db } from "../firebase";
-// import { collection, addDoc } from "firebase/firestore";
-
-// import TpBanner04 from "../components/TpBanner/TpBanner04";
-// import Tpsection04 from "../components/TpSection/TpSection04";
-// import Tpsection02 from "../components/TpSection/TpSection02";
-// import Tpsection07 from "../components/TpSection/TpSection07";
-
-// const componentToHTML = (comp) => {
-//   const text = comp.text || "텍스트입니다";
-//   const imgTag = comp.img ? `<img src='${comp.img}' alt='' />` : "";
-
-//   switch (comp.type) {
-//     case "배너04": return `<section><h2>${text}</h2>${imgTag}</section>`;
-//     case "섹션02": return `<section><p>${text}</p>${imgTag}</section>`;
-//     case "섹션04":
-//       return comp.boxes?.map((box, i) => `
-//         <section>
-//           <h3>박스${i + 1}</h3>
-//           <p>title: ${box.title}</p>
-//           <p>subtitle: ${box.subtitle}</p>
-//           <p>description: ${box.description}</p>
-//         </section>
-//       `).join("") || `<section><button>${text}</button>${imgTag}</section>`;
-//     case "섹션07": return `<section><div>${text}</div>${imgTag}</section>`;
-//     default: return "";
-//   }
-// };
-
-// const componentMap = {
-//   배너04: TpBanner04,
-//   섹션02: Tpsection02,
-//   섹션04: Tpsection04,
-//   섹션07: Tpsection07,
-// };
-
-// const ComponentItem = ({ type, label }) => {
-//   const [, dragRef] = useDrag(() => ({ type: "COMPONENT", item: { type } }));
-//   return <div ref={dragRef} style={{ background: "#eee", padding: 8, marginBottom: 8 }}>{label}</div>;
-// };
-
-// const DropCanvas = ({ components, onDrop, onDelete, onEdit }) => {
-//   const DropZone = ({ index }) => {
-//     const [{ isOver }, dropRef] = useDrop(() => ({
-//       accept: "COMPONENT",
-//       drop: (item) => onDrop(item, index),
-//       collect: (monitor) => ({ isOver: monitor.isOver() }),
-//     }));
-//     return <div ref={dropRef} style={{ height: 40, border: "2px dashed #fff", margin: "10px 0", background: isOver ? "#444" : "transparent" }} />;
-//   };
-
-//   return (
-//     <div style={{ flex: 1, padding: "0 20px", background: "#222", minHeight: 400 }}>
-//       {components.map((comp, i) => {
-//         const Comp = componentMap[comp.type];
-//         return (
-//           <React.Fragment key={i}>
-//             <DropZone index={i} />
-//             <div style={{ border: "2px dashed white", marginBottom: 20, position: "relative" }}>
-//               <Comp
-//                 text={comp.text}
-//                 img={comp.img}
-//                 boxes={comp.boxes}
-//                 onEdit={(newData) => onEdit(i, newData)}
-//               />
-//               <button
-//                 onClick={() => onDelete(i)}
-//                 style={{ position: "absolute", top: 10, right: 10, background: "#f33", color: "#fff", border: "none", padding: "8px 16px", cursor: "pointer" }}
-//               >
-//                 삭제
-//               </button>
-//             </div>
-//           </React.Fragment>
-//         );
-//       })}
-//       <DropZone index={components.length} />
-//     </div>
-//   );
-// };
-
-// function TpPage03() {
-//   const [droppedComponents, setDroppedComponents] = useState([]);
-//   const [email, setEmail] = useState("");
-//   const [name, setName] = useState("");
-
-//   const handleDrop = (item, index) => {
-//     const newItem = {
-//       ...item,
-//       text: "",
-//       img: "",
-//       ...(item.type === "섹션04" ? {
-//         boxes: [
-//           { title: "", subtitle: "", description: "" },
-//           { title: "", subtitle: "", description: "" },
-//           { title: "", subtitle: "", description: "" },
-//         ]
-//       } : {})
-//     };
-
-//     setDroppedComponents((prev) => {
-//       const newComponents = [...prev];
-//       newComponents.splice(index, 0, newItem);
-//       return newComponents;
-//     });
-//   };
-
-//   const handleEdit = (index, newData) => {
-//     setDroppedComponents((prev) =>
-//       prev.map((c, i) => (i === index ? { ...c, ...newData } : c))
-//     );
-//   };
-
-//   const handleDelete = (index) => {
-//     setDroppedComponents((prev) => prev.filter((_, i) => i !== index));
-//   };
-
-//   const handleSubmitOrder = async () => {
-//     if (!email || !name) return alert("이름과 이메일을 입력해주세요.");
-//     try {
-//       await addDoc(collection(db, "orders"), {
-//         user: { name, email },
-//         components: droppedComponents.map((comp) => {
-//           if (comp.type === "섹션04" && comp.boxes) {
-//             return { ...comp, editedBoxes: comp.boxes };
-//           }
-//           return comp;
-//         }),
-//       });
-//       alert("주문이 저장되었습니다!");
-//     } catch (err) {
-//       alert("저장 실패: " + err.message);
-//     }
-//   };
-
-//   const handleBuild = () => {
-//     const htmlBody = droppedComponents.map((c) => componentToHTML(c)).join("\n");
-//     const html = `<!DOCTYPE html><html><head><meta charset='UTF-8'><title>템플릿</title></head><body>${htmlBody}</body></html>`;
-//     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-//     saveAs(blob, "template.html");
-//   };
-
-//   return (
-//     <DndProvider backend={HTML5Backend}>
-//       <div style={{ padding: "200px 0", background: "#222" }}>
-//         <div style={{ width: 240, position: "fixed", top: 100, right: 100, background: "#f4f4f4", padding: 20 }}>
-//           <h4>🧩 컴포넌트 목록</h4>
-//           <ComponentItem type="배너04" label="배너04" />
-//           <ComponentItem type="섹션02" label="섹션02" />
-//           <ComponentItem type="섹션04" label="섹션04" />
-//           <ComponentItem type="섹션07" label="섹션07" />
-
-//           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" style={{ width: "100%", marginTop: 20 }} />
-//           <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" style={{ width: "100%", marginTop: 10 }} />
-
-//           <button onClick={handleSubmitOrder} style={{ marginTop: 16, width: "100%" }}>📤 Firestore 저장</button>
-//           <button onClick={handleBuild} style={{ marginTop: 8, width: "100%" }}>💾 HTML 다운로드</button>
-//         </div>
-
-//         <DropCanvas
-//           components={droppedComponents}
-//           onDrop={handleDrop}
-//           onDelete={handleDelete}
-//           onEdit={handleEdit}
-//         />
-//       </div>
-//     </DndProvider>
-//   );
-// }
-
-// export default TpPage03;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// TpPage03.jsx - 드래그, 수정, 이미지 업로드 및 Firestore 저장까지 완전한 구현
-// TpPage03.jsx - 드래그, 텍스트 수정, 이미지 업로드 및 Firestore 저장까지 완전한 구현
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ✅ TpPage03.jsx - 수정된 전체 코드
-// import React, { useState } from "react";
-// import { DndProvider, useDrag, useDrop } from "react-dnd";
-// import { HTML5Backend } from "react-dnd-html5-backend";
-// import { saveAs } from "file-saver";
-// import { db } from "../firebase";
-// import { collection, addDoc } from "firebase/firestore";
-
-// import TpBanner04 from "../components/TpBanner/TpBanner04";
-// import Tpsection04 from "../components/TpSection/TpSection04";
-// import Tpsection02 from "../components/TpSection/TpSection02";
-// import Tpsection07 from "../components/TpSection/TpSection07";
-
-// const componentToHTML = (comp) => {
-//   const text = comp.text || "텍스트입니다";
-//   const imgTag = comp.img ? `<img src='${comp.img}' alt='' />` : "";
-
-//   switch (comp.type) {
-//     case "배너04":
-//       return `<section><h2>${text}</h2>${imgTag}</section>`;
-//     case "섹션02":
-//       return `<section><p>${text}</p>${imgTag}</section>`;
-//     case "섹션04":
-//       return `<section><button>${text}</button>${imgTag}</section>`;
-//     case "섹션07":
-//       return `<section><div>${text}</div>${imgTag}</section>`;
-//     default:
-//       return "";
-//   }
-// };
-
-// const componentMap = {
-//   배너04: TpBanner04,
-//   섹션02: Tpsection02,
-//   섹션04: Tpsection04,
-//   섹션07: Tpsection07,
-// };
-
-// const ComponentItem = ({ type, label }) => {
-//   const [, dragRef] = useDrag(() => ({ type: "COMPONENT", item: { type } }));
-//   return (
-//     <div ref={dragRef} style={{ background: "#eee", padding: 8, marginBottom: 8 }}>{label}</div>
-//   );
-// };
-
-// const DropCanvas = ({ components, onDrop, onDelete, onEdit, onBoxEdit }) => {
-//   const DropZone = ({ index }) => {
-//     const [{ isOver }, dropRef] = useDrop(() => ({
-//       accept: "COMPONENT",
-//       drop: (item) => onDrop(item, index),
-//       collect: (monitor) => ({ isOver: monitor.isOver() }),
-//     }));
-//     return (
-//       <div ref={dropRef} style={{ height: 40, border: "2px dashed #fff", margin: "10px 0", background: isOver ? "#444" : "transparent" }} />
-//     );
-//   };
-
-//   return (
-//     <div style={{ flex: 1, padding: "0 20px", background: "#222", minHeight: 400 }}>
-//       {components.map((comp, i) => {
-//         const Comp = componentMap[comp.type];
-//         return (
-//           <React.Fragment key={i}>
-//             <DropZone index={i} />
-//             <div style={{ border: "2px dashed white", marginBottom: 20, position: "relative" }}>
-//               <Comp
-//                 text={comp.text}
-//                 img={comp.img}
-//                 boxes={comp.boxes}
-//                 onEdit={(newData) => onEdit(i, newData)}
-//                 onBoxEdit={(updatedBoxes) => onBoxEdit(i, updatedBoxes)}
-//               />
-//               <button
-//                 onClick={() => onDelete(i)}
-//                 style={{ position: "absolute", top: 10, right: 10, background: "#f33", color: "#fff", border: "none", padding: "8px 16px", cursor: "pointer" }}
-//               >
-//                 삭제
-//               </button>
-//             </div>
-//           </React.Fragment>
-//         );
-//       })}
-//       <DropZone index={components.length} />
-//     </div>
-//   );
-// };
-
-// function TpPage03() {
-//   const [droppedComponents, setDroppedComponents] = useState([]);
-//   const [email, setEmail] = useState("");
-//   const [name, setName] = useState("");
-
-//   const handleDrop = (item, index) => {
-//     const newItem = { ...item };
-//     if (item.type === "섹션04") {
-//       newItem.boxes = [
-//         {
-//           title: "통밀 바게트",
-//           subtitle: "건강한 시작을 위한 통밀의 고소함",
-//           description: "식사빵으로도 어울리는 담백한 통밀 바게트...",
-//         },
-//         {
-//           title: "시그니처 사워도우",
-//           subtitle: "하루를 든든히 채워줄 풍미 깊은 한 조각",
-//           description: "자연 그대로의 맛을 살린 사워도우...",
-//         },
-//         {
-//           title: "오곡 크림 바게트",
-//           subtitle: "겉은 바삭, 속은 촉촉.",
-//           description: "볶은 곡물의 고소함이 입안 가득 퍼지는 시그니처 곡물 롤...",
-//         },
-//       ];
-//     } else {
-//       newItem.text = "";
-//       newItem.img = "";
-//     }
-//     setDroppedComponents((prev) => {
-//       const newComponents = [...prev];
-//       newComponents.splice(index, 0, newItem);
-//       return newComponents;
-//     });
-//   };
-
-//   const handleEdit = (index, newData) => {
-//     setDroppedComponents((prev) =>
-//       prev.map((c, i) => (i === index ? { ...c, ...newData } : c))
-//     );
-//   };
-
-//   const handleBoxEdit = (index, updatedBoxes) => {
-//     setDroppedComponents((prev) =>
-//       prev.map((c, i) => (i === index ? { ...c, boxes: updatedBoxes } : c))
-//     );
-//   };
-
-//   const handleDelete = (index) => {
-//     setDroppedComponents((prev) => prev.filter((_, i) => i !== index));
-//   };
-
-//   const handleSubmitOrder = async () => {
-//     if (!email || !name) return alert("이름과 이메일을 입력해주세요.");
-//     try {
-//       await addDoc(collection(db, "orders"), {
-//         user: { name, email },
-//         components: droppedComponents,
-//       });
-//       alert("주문이 저장되었습니다!");
-//     } catch (err) {
-//       alert("저장 실패: " + err.message);
-//     }
-//   };
-
-//   const handleBuild = () => {
-//     const htmlBody = droppedComponents.map((c) => componentToHTML(c)).join("\n");
-//     const html = `<!DOCTYPE html><html><head><meta charset='UTF-8'><title>템플릿</title></head><body>${htmlBody}</body></html>`;
-//     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-//     saveAs(blob, "template.html");
-//   };
-
-//   return (
-//     <DndProvider backend={HTML5Backend}>
-//       <div style={{ padding: "200px 0", background: "#222" }}>
-//         <div style={{ width: 240, position: "fixed", top: 100, right: 100, background: "#f4f4f4", padding: 20 }}>
-//           <h4>🧩 컴포넌트 목록</h4>
-//           <ComponentItem type="배너04" label="배너04" />
-//           <ComponentItem type="섹션02" label="섹션02" />
-//           <ComponentItem type="섹션04" label="섹션04" />
-//           <ComponentItem type="섹션07" label="섹션07" />
-
-//           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" style={{ width: "100%", marginTop: 20 }} />
-//           <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" style={{ width: "100%", marginTop: 10 }} />
-
-//           <button onClick={handleSubmitOrder} style={{ marginTop: 16, width: "100%" }}>📤 Firestore 저장</button>
-//           <button onClick={handleBuild} style={{ marginTop: 8, width: "100%" }}>💾 HTML 다운로드</button>
-//         </div>
-
-//         <DropCanvas
-//           components={droppedComponents}
-//           onDrop={handleDrop}
-//           onDelete={handleDelete}
-//           onEdit={handleEdit}
-//           onBoxEdit={handleBoxEdit}
-//         />
-//       </div>
-//     </DndProvider>
-//   );
-// }
-
-// export default TpPage03;
-
-
-
-
-
-
-
-
-
-
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { saveAs } from "file-saver";
 import { db } from "../firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { motion, AnimatePresence } from "framer-motion"; // ✅ 부드러운 전환
-
+import { ScrollTrigger } from "gsap/ScrollTrigger"; // 이미 있는 경우 생략 가능
+import { useLocation, useNavigate } from "react-router-dom";
+import ReactDOM from "react-dom";
+import { collection, addDoc, serverTimestamp, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { motion, AnimatePresence, hover } from "framer-motion";
+import TpHeader01 from "../layout/TpHeader/TpHeader01";
+import TpHeader02 from "../layout/TpHeader/TpHeader02";
+import TpHeader03 from "../layout/TpHeader/TpHeader03";
+import TpHeader04 from "../layout/TpHeader/TpHeader04";
 import TpBanner04 from "../components/TpBanner/TpBanner04";
 import TpBannerSwiper from "../components/TpBanner/TpBannerSwiper";
 import TpLogoInfiniteSlider from "../components/TpSection/TpLogoInfiniteSlider";
@@ -1382,53 +23,112 @@ import TpTeamStructure from "../components/TpSection/TpTeamStructure";
 import TpEventGrid from "../components/TpSection/TpEventGrid";
 import Tpsection07 from "../components/TpSection/TpSection07";
 import TpSection06 from "../components/TpSection/TpSection06";
+import TpHeaderUser from "../layout/TpHeader/TpHeaderUser";
+
+// ✅ Shopify API 정보 추가
+const SHOPIFY_DOMAIN = "rejg0h-j1.myshopify.com"; // 👉 본인 거 입력
+const STOREFRONT_ACCESS_TOKEN = "daa886fc29a2cec8d02aadc28ce245da"; // 👉 본인 거 입력
 
 const componentMap = {
+  헤더01: TpHeader01,
+  헤더02: TpHeader02,
+  헤더03: TpHeader03,
+  헤더04: TpHeader04,
   배너04: TpBanner04,
-  배너Swiper: TpBannerSwiper, // ✅ 추가
-  배너로고슬라이드: TpLogoInfiniteSlider, // ✅ 추가  섹션02: Tpsection02,
+  배너Swiper: TpBannerSwiper,
+  배너로고슬라이드: TpLogoInfiniteSlider,
+  섹션02: Tpsection02,
   섹션04: Tpsection04,
   섹션06: TpSection06,
   섹션07: Tpsection07,
-  섹션포트폴리오: TpSectionPortfolio, // ✅ 추가
-  프로젝트슬라이드: TpProjectSlider, // ✅ 등록
-  팀구성: TpTeamStructure, // ✅ 등록 완료
-  행사그리드: TpEventGrid
+  섹션포트폴리오: TpSectionPortfolio,
+  프로젝트슬라이드: TpProjectSlider,
+  팀구성: TpTeamStructure,
+  행사그리드: TpEventGrid,
 };
 
-// ✅ 드래그 가능한 컴포넌트
-const ComponentItem = ({ type, label }) => {
+const ComponentItem = ({ type, label, previewImage, previewVideo }) => {
   const [, dragRef] = useDrag(() => ({ type: "COMPONENT", item: { type } }));
+  const [hovered, setHovered] = useState(false);
+
   return (
     <div
       ref={dragRef}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         background: "#fff",
-        padding: 50,
+        padding: 20,
+        marginBottom: "10px",
         cursor: "grab",
         borderBottom: "1px solid #ccc",
         borderRadius: 8,
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
         transition: "all 0.3s",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      {label}
+      <div style={{ fontWeight: "bold", textAlign: "center", marginBottom: 10 }}>
+        {label}
+      </div>
+
+      {/* 이미지/영상 프리뷰 */}
+      <div
+        style={{
+          width: "100%",
+          height: 180,
+          borderRadius: 8,
+          overflow: "hidden",
+          position: "relative",
+        }}
+      >
+        {/* 이미지 또는 영상 미리보기 */}
+        {previewImage && (
+          <img
+            src={previewImage}
+            alt="preview"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              transition: "transform 0.4s ease-in-out",
+              transform: hovered ? "scale(1.05)" : "scale(1)",
+            }}
+          />
+        )}
+
+        {previewVideo && (
+          <video
+            src={previewVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              transition: "transform 0.4s ease-in-out",
+              transform: hovered ? "scale(1.05)" : "scale(1)",
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 };
 
+
+
 // ✅ 상단 탭 메뉴
-const SlideMenu = ({ visible, activeTab, setActiveTab, tabItems }) => {
+const SlideMenu = ({ activeTab, setActiveTab, tabItems }) => {
   return (
     <div
       style={{
-        position: "fixed",
-        top: 100,
-        left: 0,
         width: "100%",
         background: "#fff",
         boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-        zIndex: 1000,
       }}
     >
       {/* 탭 버튼 */}
@@ -1452,8 +152,8 @@ const SlideMenu = ({ visible, activeTab, setActiveTab, tabItems }) => {
               padding: "8px 16px",
               cursor: "pointer",
               fontWeight: "bold",
+              borderRadius: 8,
               transition: "all 0.3s ease",
-              borderRadius: 6,
             }}
           >
             {tab}
@@ -1461,24 +161,29 @@ const SlideMenu = ({ visible, activeTab, setActiveTab, tabItems }) => {
         ))}
       </div>
 
-      {/* 컴포넌트 목록 전환 영역 */}
+      {/* 컴포넌트 목록 */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.3 }}
           style={{
-            display: "flex",
-            gap: 20,
+            height: "500px",
+            overflowY: "auto",
             padding: 20,
-            justifyContent: "center",
             background: "#f9f9f9",
           }}
         >
           {tabItems[activeTab].map((item) => (
-            <ComponentItem key={item.type} type={item.type} label={item.label} />
+            <ComponentItem
+              key={item.type}
+              type={item.type}
+              label={item.label}
+              previewImage={item.previewImage}
+              previewVideo={item.previewVideo}
+            />
           ))}
         </motion.div>
       </AnimatePresence>
@@ -1487,88 +192,399 @@ const SlideMenu = ({ visible, activeTab, setActiveTab, tabItems }) => {
 };
 
 
-const DropCanvas = ({ components, onDrop, onDelete, onEdit, onBoxEdit, onUpdate }) => {
+
+const DropCanvas = ({
+  components,
+  onDrop,
+  onDelete,
+  onEdit,
+  onBoxEdit,
+  onUpdate,
+  pages,
+  orderId,
+  menuItems,
+  setMenuItems
+}) => {
   const DropZone = ({ index }) => {
     const [{ isOver }, dropRef] = useDrop(() => ({
       accept: "COMPONENT",
       drop: (item) => onDrop(item, index),
-      collect: (monitor) => ({ isOver: monitor.isOver() })
+      collect: (monitor) => ({ isOver: monitor.isOver() }),
     }));
-    return <div ref={dropRef} style={{ height: 40, border: "2px dashed #fff", margin: "10px 0", background: isOver ? "#444" : "transparent" }} />;
+
+    return (
+      <div
+        ref={dropRef}
+        style={{
+          height: 40,
+          border: "2px dashed #fff",
+          margin: "10px 0",
+          background: isOver ? "#444" : "transparent",
+        }}
+      />
+    );
   };
 
   return (
-    <div style={{ flex: 1, padding: "0 20px", background: "#222", minHeight: 400, paddingTop: 200 }}>
-      {components.map((comp, i) => {
-        const Comp = componentMap[comp.type];
-        return (
-          <React.Fragment key={comp.id ?? i}>
-            <DropZone index={i} />
-            <div style={{ border: "2px dashed white", marginBottom: 20, position: "relative" }}>
-              <Comp
-                text={comp.text}
-                img={comp.img}
-                boxes={comp.boxes}
-                titleText={comp.titleText}
-                subTitleText={comp.subTitleText}
-                align={comp.align}
-                data={comp.data}
-                onEdit={(newData) => onEdit(i, newData)}
-                onBoxEdit={(updatedData) => onBoxEdit(i, updatedData)}
-                onUpdate={(updatedData) => onUpdate(i, updatedData)}
-              />
-              <button
-                onClick={() => onDelete(i)}
-                style={{ position: "absolute", top: 10, right: 10, background: "#f33", color: "#fff", border: "none", padding: "8px 16px", cursor: "pointer" }}
-              >
-                삭제
-              </button>
-            </div>
-          </React.Fragment>
-        );
-      })}
+    <div
+      style={{
+        flex: 1,
+        padding: "0 20px",
+        background: "#222",
+        minHeight: 400,
+        paddingTop: 200,
+        zIndex: 1,
+      }}
+    >
+      {/* 헤더를 제외한 컴포넌트만 렌더링 */}
+      {components
+        .filter((comp) => !comp.type.startsWith("헤더"))
+        .map((comp, i) => {
+          const Comp = componentMap[comp.type];
+          return (
+            <React.Fragment key={comp.id ?? i}>
+              <DropZone index={i} />
+              <AnimatePresence>
+                <motion.div
+                  key={comp.id ?? i}
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 40 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  style={{
+                    border: "2px dashed white",
+                    marginBottom: 20,
+                    position: "relative",
+                  }}
+                >
+                  <Comp
+                    {...comp}
+                    pages={pages}
+                    orderId={orderId}
+                    onEdit={(newData) => onEdit(i, newData)}
+                    onBoxEdit={(updatedData) => onBoxEdit(i, updatedData)}
+                    onUpdate={(updatedData) => onUpdate(i, updatedData)}
+                    {...(comp.type === "헤더02"
+                      ? { menuItems, setMenuItems }
+                      : {})}
+                  />
+                  <button
+                    onClick={() => onDelete(i)}
+                    style={{
+                      position: "absolute",
+                      top: 10,
+                      right: 10,
+                      background: "#f33",
+                      color: "#fff",
+                      border: "none",
+                      padding: "8px 16px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    삭제
+                  </button>
+                </motion.div>
+              </AnimatePresence>
+            </React.Fragment>
+          );
+        })}
       <DropZone index={components.length} />
     </div>
   );
 };
 
+
+const defaultMenus = [
+  { id: 1, label: "식사의 가치", link: "/preview?page=0" },
+  { id: 2, label: "브랜드 스토리", link: "/preview?page=1" },
+  { id: 3, label: "고객의 신뢰", link: "/preview?page=2" },
+  { id: 4, label: "자주 묻는 질문", link: "/preview?page=3" },
+];
+
 function TpPage03() {
-  const [droppedComponents, setDroppedComponents] = useState([]);
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const initialPage = parseInt(queryParams.get("page") || "0", 10);
+  const [orderId, setOrderId] = useState(null); // 🔥 추가
+
+  const [pages, setPages] = useState([{ id: Date.now(), components: [], menuItems: defaultMenus }]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [products, setProducts] = useState([]);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [activeTab, setActiveTab] = useState("인트로배너");
+  const navigate = useNavigate(); // TpPage03 안에서 선언
+  // 🔥 Firestore에서 저장된 컴포넌트 가져오기
+  const [savedSites, setSavedSites] = useState([]); // 🔥 저장된 사이트 리스트
+  const [showModal, setShowModal] = useState(false); // 🔥 모달 열기/닫기
+  const [showMenu, setShowMenu] = useState(false);
+  const [headerType, setHeaderType] = useState("헤더02");
+  const [showRightPanel, setShowRightPanel] = useState(false); // 👉 추가
+  // Firestore 초기화 확인
+  useEffect(() => {
+    if (!db) {
+      console.error("Firestore가 초기화되지 않았습니다.");
+      return;
+    }
+  }, []);
 
-  const tabItems = {
-    인트로배너: [{ type: "배너04", label: "배너04" },
-    { type: "배너Swiper", label: "배너 스와이퍼" }],
-    중간섹션: [
-      { type: "섹션02", label: "섹션02" },
-      { type: "섹션04", label: "섹션04" },
-      { type: "섹션06", label: "섹션06" },
-      { type: "섹션07", label: "섹션07" },
-      { type: "배너로고슬라이드", label: "로고 슬라이드" },
-      { type: "섹션포트폴리오", label: "섹션 포트폴리오" }, // ✅ 추가
-      { type: "프로젝트슬라이드", label: "프로젝트 슬라이드" }, // ✅ 추가
-      { type: "팀구성", label: "팀 구성" }, // ✅ 추가!
-      { type: "행사그리드", label: "행사그리드" }, // ✅ 추가!
-    ],
+  const fetchSavedSites = async () => {
+    if (!db) {
+      alert("Firestore가 초기화되지 않았습니다.");
+      return;
+    }
+
+    try {
+      const querySnapshot = await getDocs(collection(db, "orders"));
+      const sites = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setSavedSites(sites);
+      setShowModal(true);
+    } catch (error) {
+      console.error("🔥 사이트 목록 불러오기 실패:", error);
+      alert("사이트 목록을 불러오는데 실패했습니다.");
+    }
   };
 
+  const handleDeleteSite = async (id) => {
+    if (!db) {
+      alert("Firestore가 초기화되지 않았습니다.");
+      return;
+    }
+
+    const confirmDelete = window.confirm("정말 삭제하시겠습니까?");
+    if (!confirmDelete) return;
+
+    try {
+      await deleteDoc(doc(db, "orders", id));
+      alert("삭제되었습니다!");
+      setSavedSites((prevSites) => prevSites.filter((site) => site.id !== id));
+    } catch (error) {
+      console.error("🔥 삭제 실패:", error);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleSelectSite = (siteData) => {
+    // pages의 각 요소에 menuItems가 없으면 defaultMenus로 보완
+    const fixedPages = (siteData.pages || []).map(page => ({
+      ...page,
+      menuItems: page.menuItems || defaultMenus
+    }));
+    setPages(fixedPages);
+    setOrderId(siteData.id);
+    setHeaderType(siteData.headerType || "헤더02"); // 헤더 타입 복원
+    setShowModal(false);
+    navigate("/preview", { state: { pages: fixedPages, headerType: siteData.headerType || "헤더02" } });
+  };
+  
+  
+  // 🔥 사이트 전체 삭제 함수
+const handleDeleteAllSites = async () => {
+  const confirmDelete = window.confirm("정말 모든 사이트를 삭제하시겠습니까?");
+  if (!confirmDelete) return;
+
+  try {
+    const querySnapshot = await getDocs(collection(db, "orders"));
+    const batchDelete = querySnapshot.docs.map((docItem) =>
+      deleteDoc(doc(db, "orders", docItem.id))
+    );
+
+    await Promise.all(batchDelete); // 모두 삭제 완료 기다리기
+    alert("전체 삭제되었습니다!");
+
+    setSavedSites([]); // 화면에서도 전부 지워주기
+  } catch (error) {
+    console.error("🔥 전체 삭제 실패:", error);
+    alert("전체 삭제 중 오류가 발생했습니다.");
+  }
+};
+
+  const fetchSavedComponents = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "orders"));
+      if (!querySnapshot.empty) {
+        const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+        const data = lastDoc.data();
+
+        console.log("✅ 저장된 데이터 불러오기 성공:", data.components);
+        return data.components || [];
+      } else {
+        console.log("❗ 저장된 데이터 없음");
+        return [];
+      }
+    } catch (error) {
+      console.error("🔥 Firestore 데이터 가져오기 실패:", error);
+      return [];
+    }
+  };
+  // 🔥 저장된 사이트 불러오기
+  const handleLoadSavedSite = async () => {
+    const savedComponents = await fetchSavedComponents();
+    // savedComponents가 pages 구조라면 보정
+    const fixedPages = (savedComponents || []).map(page => ({
+      ...page,
+      menuItems: page.menuItems || defaultMenus
+    }));
+    if (fixedPages.length > 0) {
+      navigate("/preview", { state: { pages: fixedPages } });
+    } else {
+      alert("❗ 저장된 사이트 데이터가 없습니다.");
+    }
+  };
+
+  useEffect(() => {
+    const incomingOrderId = location.state?.orderId;
+    if (incomingOrderId) {
+      setOrderId(incomingOrderId);
+    }
+  }, [location.state]);
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const pageIndex = parseInt(params.get("page"), 10);
+    if (!isNaN(pageIndex)) {
+      setCurrentPage(pageIndex);
+    }
+  }, [location]);
+  // ✅ Shopify 상품 가져오기
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (!SHOPIFY_DOMAIN || !STOREFRONT_ACCESS_TOKEN) {
+        console.warn("Shopify API 정보가 설정되지 않았습니다.");
+        return;
+      }
+
+      const endpoint = `https://${SHOPIFY_DOMAIN}/api/2023-04/graphql.json`;
+      const query = `{
+        products(first: 10) {
+          edges {
+            node {
+              id
+              title
+              description
+              images(first: 1) {
+                edges {
+                  node {
+                    url
+                  }
+                }
+              }
+              variants(first: 1) {
+                edges {
+                  node {
+                    price {
+                      amount
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }`;
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Shopify-Storefront-Access-Token": STOREFRONT_ACCESS_TOKEN,
+          },
+          body: JSON.stringify({ query }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        if (result.errors) {
+          throw new Error(result.errors[0].message);
+        }
+
+        const fetchedProducts = result.data.products.edges.map(edge => ({
+          id: edge.node.id,
+          title: edge.node.title,
+          description: edge.node.description,
+          imageUrl: edge.node.images.edges[0]?.node.url || "",
+          price: edge.node.variants.edges[0]?.node.price.amount || null,
+        }));
+
+        setProducts(fetchedProducts);
+        window.shopifyProducts = fetchedProducts;
+      } catch (error) {
+        console.error("🔥 Shopify 상품 가져오기 실패:", error);
+        // 에러 발생 시 빈 배열로 초기화
+        setProducts([]);
+      }
+    };
+    
+    fetchProducts();
+  }, []);
+
+  // 1. pages가 바뀔 때마다 sessionStorage에 저장
+  useEffect(() => {
+    sessionStorage.setItem("tp_pages", JSON.stringify(pages));
+  }, [pages]);
+
+  // 2. 페이지가 처음 마운트될 때 sessionStorage에서 불러오기
+  useEffect(() => {
+    const saved = sessionStorage.getItem("tp_pages");
+    if (saved) {
+      setPages(JSON.parse(saved));
+    }
+  }, []);
+  useEffect(() => {
+    // 페이지나 헤더 타입이 바뀔 때마다 ScrollTrigger 새로고침
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 500); // DOM이 안정화되고 나서 실행
+  }, [pages, headerType]);
+  
+  // ✅ 여기서부터는 기존 TpPage03 코드 그대로 작성하면 됩니다
+  
+  const tabItems = {
+    인트로배너: [
+      { type: "배너04", label: "배너04", previewImage: "/preview/banner04.jpg" },
+      { type: "헤더01", label: "헤더 01", previewImage: "/preview/header01.jpg" },
+      { type: "헤더02", label: "헤더 02", previewImage: "/preview/header02.jpg" },
+      { type: "헤더03", label: "헤더 03", previewImage: "/preview/header03.jpg" },
+      { type: "헤더04", label: "헤더 04", previewImage: "/preview/header04.jpg" },
+      { type: "배너Swiper", label: "배너 스와이퍼", previewImage: "/images/add_01.png" },
+    ],
+    중간섹션: [
+      { type: "섹션02", label: "섹션02", previewImage: "/preview/section02.jpg" },
+      { type: "섹션04", label: "섹션04", previewVideo: "/preview/section04.mp4" },
+      { type: "섹션06", label: "섹션06", previewImage: "/preview/section06.jpg" },
+      { type: "섹션07", label: "섹션07", previewImage: "/preview/section07.jpg" },
+      // ...
+    ]
+  };
+  
   const handleDrop = (item, index) => {
+    if (["헤더01", "헤더02", "헤더03", "헤더04"].includes(item.type)) {
+      setHeaderType(item.type);
+      return;
+    }
     const newItem = { ...item, id: Date.now() + Math.random() };
-    if (item.type === "배너로고슬라이드") {
+    if (item.type === "헤더02") {
+      newItem.user = null; // 기본값
+    }
+    // 🔧 타입에 따라 기본 데이터 설정
+    else if (item.type === "배너로고슬라이드") {
       newItem.logos = [
         { id: 1, imageUrl: "https://via.placeholder.com/120x60?text=Logo1" },
         { id: 2, imageUrl: "https://via.placeholder.com/120x60?text=Logo2" },
       ];
-    }
-    else if (item.type === "배너Swiper") {
+    } else if (item.type === "배너Swiper") {
       newItem.slides = [
         { title: "슬라이드 1", subTitle: "서브1", imageUrl: "", align: "center" },
         { title: "슬라이드 2", subTitle: "서브2", imageUrl: "", align: "center" },
       ];
-    }
-    else if (item.type === "팀구성") {
+    } else if (item.type === "팀구성") {
       newItem.data = [
         {
           number: "①",
@@ -1578,16 +594,8 @@ function TpPage03() {
             { en: "Contents Organization", ko: "콘텐츠 정리", detail: "콘텐츠 항목 분류 및 구조화" },
           ],
         },
-        {
-          number: "②",
-          title: "Design",
-          items: [
-            { en: "Website Design", ko: "웹사이트 디자인", detail: "웹사이트 UI/UX 화면 설계" },
-          ],
-        },
       ];
-    }
-    else if (item.type === "섹션포트폴리오") {
+    } else if (item.type === "섹션포트폴리오") {
       newItem.data = [
         {
           id: 1,
@@ -1596,20 +604,10 @@ function TpPage03() {
           brand: "boribori",
           description: "app renewal ux design",
         },
-        {
-          id: 2,
-          mediaType: "image",
-          mediaUrl: "https://via.placeholder.com/300x400?text=Sample2",
-          brand: "SSF SHOP",
-          description: "2023 fall lookbook",
-        },
       ];
-    }
-    else if (item.type === "프로젝트슬라이드") {
-      // 슬라이드는 기본값 안 줘도 되고 빈 객체로 충분!
-      newItem.data = []; // (선택 사항: 기본값이 컴포넌트 안에 있으니까 생략해도 됨)
-    }
-    else if (item.type === "행사그리드") {
+    } else if (item.type === "프로젝트슬라이드") {
+      newItem.data = [];
+    } else if (item.type === "행사그리드") {
       newItem.data = [
         {
           id: Date.now() + 1,
@@ -1618,35 +616,15 @@ function TpPage03() {
           date: "2023.05.16 - 05.20",
           thumbnail: "",
         },
-        {
-          id: Date.now() + 2,
-          type: "Convention",
-          title: "2023 세계 제약ㆍ바이오 산업 전시회",
-          date: "2023.05.26 - 08.25",
-          thumbnail: "",
-        },
-        {
-          id: Date.now() + 3,
-          type: "Event",
-          title: "2023 하반기 아일랜드 유학 설명회",
-          date: "2023.06.01 - 08.25",
-          thumbnail: "",
-        },
-        {
-          id: Date.now() + 4,
-          type: "Custom",
-          title: "PIS 2023 DIGITAL SHOW",
-          date: "2023.06.01 - 08.25",
-          thumbnail: "https://via.placeholder.com/400x500?text=PIS+2023",
-        },
       ];
-    }
-    
-    else if (item.type === "섹션04") {
+    } else if (item.type === "섹션04") {
       newItem.boxes = [
-        { title: "통밀 바게트", subtitle: "건강한 시작을 위한 통밀의 고소함", description: "식사빵으로도 어울리는 담백한 통밀 바게트...", imageClass: "" },
-        { title: "시그니처 사워도우", subtitle: "하루를 든든히 채워줄 풍미 깊은 한 조각", description: "자연 그대로의 맛을 살린 사워도우...", imageClass: "" },
-        { title: "오곡 크림 바게트", subtitle: "겉은 바삭, 속은 촉촉.", description: "볶은 곡물의 고소함이 입안 가득 퍼지는 시그니처 곡물 롤...", imageClass: "" },
+        {
+          title: "통밀 바게트",
+          subtitle: "건강한 시작을 위한 통밀의 고소함",
+          description: "식사빵으로도 어울리는 담백한 통밀 바게트...",
+          imageClass: "",
+        },
       ];
       newItem.titleText = "기본 제목";
       newItem.subTitleText = "기본 서브제목";
@@ -1662,36 +640,94 @@ function TpPage03() {
       ];
     } else if (item.type === "섹션06") {
       newItem.data = [
-        { question: "Q. 어떤 기준으로 빵을 만드나요?", answer: "A. 건강한 재료와 정직한 공정을 가장 중요하게 생각합니다." },
-        { question: "Q. 바쁜 일상 속에서도 구매할 수 있나요?", answer: "A. 온라인 예약 및 픽업도 지원하고 있어요." }
+        {
+          question: "Q. 어떤 기준으로 빵을 만드나요?",
+          answer: "A. 건강한 재료와 정직한 공정을 가장 중요하게 생각합니다.",
+        },
       ];
       newItem.titleText = "자주 묻는 질문들";
       newItem.subTitleText = "자주 들어오는 질문과 답변을 모았습니다.";
       newItem.align = "center";
     }
+  
+    if (item.type === "헤더02") {
+      // 모든 페이지에 header02가 없으면 추가
+      setPages((prevPages) => prevPages.map(page => {
+        const hasHeader = page.components.some(c => c.type === "헤더02");
+        if (!hasHeader) {
+          const newComponents = [...page.components];
+          newComponents.splice(index, 0, newItem);
+          return { ...page, components: newComponents };
+        }
+        return page;
+      }));
+    } else {
+      setPages((prevPages) => {
+        const updatedPages = [...prevPages];
+        const targetComponents = [...(updatedPages[currentPage]?.components || [])];
+        targetComponents.splice(index, 0, newItem);
+        updatedPages[currentPage] = {
+          ...updatedPages[currentPage],
+          components: targetComponents,
+        };
+        return updatedPages;
+      });
+    }
+  };
+  
 
-    setDroppedComponents((prev) => {
-      const newComponents = [...prev];
-      newComponents.splice(index, 0, newItem);
-      return newComponents;
+  const handleEdit = (index, newData) => {
+    setPages((prevPages) => {
+      const updatedPages = [...prevPages];
+      updatedPages[currentPage] = {
+        ...updatedPages[currentPage],
+        components: updatedPages[currentPage].components.map((c, i) =>
+          i === index ? { ...c, ...newData } : c
+        ),
+      };
+      return updatedPages;
     });
   };
 
-  const handleEdit = (index, newData) => {
-    setDroppedComponents((prev) => prev.map((c, i) => (i === index ? { ...c, ...newData } : c)));
-  };
-
   const handleBoxEdit = (index, updatedData) => {
-    setDroppedComponents((prev) => prev.map((c, i) => (i === index ? { ...c, ...updatedData } : c)));
+    setPages((prevPages) => {
+      const updatedPages = [...prevPages];
+      updatedPages[currentPage] = {
+        ...updatedPages[currentPage],
+        components: updatedPages[currentPage].components.map((c, i) =>
+          i === index ? { ...c, ...updatedData } : c
+        ),
+      };
+      return updatedPages;
+    });
   };
 
-  const handleUpdate = (index, updatedData) => {
-    setDroppedComponents((prev) => prev.map((c, i) => (i === index ? { ...c, data: updatedData.data, titleText: updatedData.titleText, subTitleText: updatedData.subTitleText, align: updatedData.align } : c)));
-  };
+const handleUpdate = (index, updatedData) => {
+  setPages((prevPages) => {
+    const updatedPages = [...prevPages];
+    updatedPages[currentPage] = {
+      ...updatedPages[currentPage],
+      components: updatedPages[currentPage].components.map((c, i) =>
+        i === index ? { ...c, ...updatedData } : c
+      ),
+    };
+    return updatedPages;
+  });
+};
 
-  const handleDelete = (index) => {
-    setDroppedComponents((prev) => prev.filter((_, i) => i !== index));
-  };
+
+const handleDelete = (index) => {
+  setPages((prevPages) => {
+    const updatedPages = [...prevPages];
+    const newComponents = [...updatedPages[currentPage].components];
+    newComponents.splice(index, 1);
+    updatedPages[currentPage] = {
+      ...updatedPages[currentPage],
+      components: newComponents,
+    };
+    return updatedPages;
+  });
+};
 
   const removeUndefined = (obj) => {
     if (Array.isArray(obj)) {
@@ -1707,27 +743,127 @@ function TpPage03() {
     }
     return obj;
   };
+    const clearSavedComponents = () => {
+      localStorage.removeItem("savedComponents");
+    };
+  
+    const handleSubmitOrder = async () => {
+      if (!db) {
+        alert("Firestore가 초기화되지 않았습니다.");
+        return;
+      }
 
-  const handleSubmitOrder = async () => {
-    if (!email || !name) return alert("이름과 이메일을 입력해주세요.");
-    try {
-      const cleanComponents = removeUndefined(droppedComponents);
+      if (!email || !name) {
+        alert("이름과 이메일을 입력해주세요.");
+        return;
+      }
 
-      await addDoc(collection(db, "orders"), {
-        user: { name, email },
-        components: cleanComponents,
-        createdAt: serverTimestamp(),
-      });
-
-      alert("주문이 저장되었습니다!");
-    } catch (err) {
-      alert("저장 실패: " + err.message);
-      console.error("🔥 Firestore 저장 오류:", err);
-    }
-  };
+      try {
+        const docRef = await addDoc(collection(db, "orders"), {
+          user: { name, email },
+          pages,
+          headerType, // 헤더 타입도 함께 저장
+          createdAt: serverTimestamp(),
+        });
+        setOrderId(docRef.id);
+        clearSavedComponents();
+        alert("주문이 저장되었습니다!");
+      } catch (err) {
+        console.error("🔥 Firestore 저장 오류:", err);
+        alert("저장 실패: " + err.message);
+      }
+    };
 
   const handleBuild = () => {
-    const htmlBody = droppedComponents.map((c) => `<section>${c.text || ""}</section>`).join("\n");
+    const htmlBody = pages.map((page, pageIndex) => {
+      const pageTitle = `<h2 class="page-title">📄 페이지 ${pageIndex + 1}</h2>`;
+      const comps = page.components.map((c) => {
+        if (c.type === "배너04") {
+          return `
+            <section class="tpBanner04">
+              ${
+                c.mediaType === "video"
+                  ? `<video class="tpBanner04__background" autoplay loop muted playsinline><source src="${c.mediaUrl}" type="video/mp4"></video>`
+                  : `<div class="tpBanner04__background" style="background-image:url('${c.mediaUrl}')"></div>`
+              }
+              <div class="tpBanner04__text" style="text-align:${c.align}">
+                <h2>${c.title}</h2>
+                <p>${c.subTitle}</p>
+                <button class="btn">${c.buttonText || "지금 문의하기"}</button>
+              </div>
+            </section>
+          `;
+        }
+    
+        if (c.type === "섹션04") {
+          return `
+            <section>
+              <h2 style="text-align:${c.align}">${c.titleText || ""}</h2>
+              <p style="text-align:${c.align}">${c.subTitleText || ""}</p>
+              <div class="section04-box">
+                ${(c.boxes || []).map((box) => `
+                  <div class="item">
+                    <div class="item-image" style="background-image:url('${box.imageClass || ""}')"></div>
+                    <h3>${box.title}</h3>
+                    <p>${box.subtitle}</p>
+                    <p>${box.description}</p>
+                  </div>
+                `).join("")}
+              </div>
+            </section>
+          `;
+        }
+    
+        if (c.type === "섹션07") {
+          return `
+            <section>
+              <h2 style="text-align:${c.align || 'center'}">${c.titleText || ""}</h2>
+              <p style="text-align:${c.align || 'center'}">${c.subTitleText || ""}</p>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                ${(c.data || []).map((item, i) => `
+                  <div style="border: 1px solid #ccc; padding: 12px; width: 200px;">
+                    <strong>${item.label || "항목"}</strong>
+                    <div>${item.percentage || 0}%</div>
+                  </div>
+                `).join("")}
+              </div>
+            </section>
+          `;
+        }
+    
+        if (c.type === "섹션06") {
+          return `
+            <section>
+              <h2 style="text-align:${c.align || 'center'}">${c.titleText || ""}</h2>
+              <p style="text-align:${c.align || 'center'}">${c.subTitleText || ""}</p>
+              <ul>
+                ${(c.data || []).map((qa) => `
+                  <li><strong>Q.</strong> ${qa.question}<br/><strong>A.</strong> ${qa.answer}</li>
+                `).join("")}
+              </ul>
+            </section>
+          `;
+        }
+    
+        if (c.type === "섹션02") {
+          return `
+            <section>
+              <p style="text-align:${c.align || 'center'}">${c.text || ""}</p>
+            </section>
+          `;
+        }
+    
+        // 그 외 텍스트 중심 섹션
+        return `
+          <section>
+            <h2 style="text-align:${c.align || 'center'}">${c.titleText || c.title || ""}</h2>
+            <p style="text-align:${c.align || 'center'}">${c.subTitleText || c.subTitle || c.text || ""}</p>
+          </section>
+        `;
+      }).join("");
+    
+      return pageTitle + comps;
+    }).join("\n");
     const html = `<!DOCTYPE html><html><head><meta charset='UTF-8'><title>템플릿</title></head><body>${htmlBody}</body></html>`;
     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
     saveAs(blob, "template.html");
@@ -1739,107 +875,111 @@ const handlePreview = () => {
 
   const style = `
     <style>
-      * { box-sizing: border-box; }
       body { margin: 0; font-family: 'Pretendard', sans-serif; background: #fff; color: #333; }
-      section { padding: 60px; }
-      .tpBanner04 {
-        position: relative;
-        width: 100%;
-        height: 100vh;
-        overflow: hidden;
-        padding: 0 50px;
-        color: white;
-      }
-      .tpBanner04__background {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        object-fit: cover;
-        z-index: 1;
-        filter: brightness(80%);
-      }
-      .tpBanner04__text {
-        position: relative;
-        z-index: 2;
-        top: 50%;
-        transform: translateY(-50%);
-        text-align: center;
-      }
+      section { padding: 60px; border-bottom: 1px solid #eee; }
+      h2.page-title { padding: 20px; background: #f7f7f7; margin: 0; text-align: center; }
+      .tpBanner04 { position: relative; width: 100%; height: 100vh; overflow: hidden; color: white; }
+      .tpBanner04__background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(80%); z-index: 1; }
+      .tpBanner04__text { position: relative; z-index: 2; top: 50%; transform: translateY(-50%); text-align: center; }
       .tpBanner04__text h2 { font-size: 60px; margin-bottom: 16px; }
       .tpBanner04__text p { font-size: 22px; margin-bottom: 30px; }
-      .tpBanner04__text .btn {
-        border-radius: 100px;
-        border: none;
-        padding: 14px 30px;
-        font-size: 18px;
-        font-weight: bold;
-        background-color: rgba(0, 0, 0, 0.4);
-        color: white;
-      }
-      .section04-box {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        justify-content: center;
-      }
-      .section04-box .item {
-        width: 300px;
-        border: 1px solid #ccc;
-        padding: 16px;
-      }
-      .section04-box .item-image {
-        width: 100%;
-        height: 180px;
-        background-size: cover;
-        background-position: center;
-        margin-bottom: 12px;
-      }
+      .tpBanner04__text .btn { border-radius: 100px; border: none; padding: 14px 30px; font-size: 18px; font-weight: bold; background-color: rgba(0, 0, 0, 0.4); color: white; }
+      .section04-box { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+      .section04-box .item { width: 300px; border: 1px solid #ccc; padding: 16px; }
+      .section04-box .item-image { width: 100%; height: 180px; background-size: cover; background-position: center; margin-bottom: 12px; }
     </style>
   `;
 
-  const body = droppedComponents.map((c) => {
-    if (c.type === "배너04") {
-      return `
-        <section class="tpBanner04">
-          ${c.mediaType === "video"
-            ? `<video class="tpBanner04__background" autoplay loop muted playsinline><source src="${c.mediaUrl}" type="video/mp4"></video>`
-            : `<div class="tpBanner04__background" style="background-image:url('${c.mediaUrl}')"></div>`}
-          <div class="tpBanner04__text" style="text-align:${c.align}">
-            <h2 class="title">${c.title}</h2>
-            <p class="subTitle">${c.subTitle}</p>
-            <button class="btn">지금 문의하기</button>
-          </div>
-        </section>
-      `;
-    }
-
-    if (c.type === "섹션04") {
+  const body = pages.map((page, pageIndex) => {
+    const pageTitle = `<h2 class="page-title">📄 페이지 ${pageIndex + 1}</h2>`;
+    const comps = page.components.map((c) => {
+      if (c.type === "배너04") {
+        return `
+          <section class="tpBanner04">
+            ${
+              c.mediaType === "video"
+                ? `<video class="tpBanner04__background" autoplay loop muted playsinline><source src="${c.mediaUrl}" type="video/mp4"></video>`
+                : `<div class="tpBanner04__background" style="background-image:url('${c.mediaUrl}')"></div>`
+            }
+            <div class="tpBanner04__text" style="text-align:${c.align}">
+              <h2>${c.title}</h2>
+              <p>${c.subTitle}</p>
+              <button class="btn">${c.buttonText || "지금 문의하기"}</button>
+            </div>
+          </section>
+        `;
+      }
+  
+      if (c.type === "섹션04") {
+        return `
+          <section>
+            <h2 style="text-align:${c.align}">${c.titleText || ""}</h2>
+            <p style="text-align:${c.align}">${c.subTitleText || ""}</p>
+            <div class="section04-box">
+              ${(c.boxes || []).map((box) => `
+                <div class="item">
+                  <div class="item-image" style="background-image:url('${box.imageClass || ""}')"></div>
+                  <h3>${box.title}</h3>
+                  <p>${box.subtitle}</p>
+                  <p>${box.description}</p>
+                </div>
+              `).join("")}
+            </div>
+          </section>
+        `;
+      }
+  
+      if (c.type === "섹션07") {
+        return `
+          <section>
+            <h2 style="text-align:${c.align || 'center'}">${c.titleText || ""}</h2>
+            <p style="text-align:${c.align || 'center'}">${c.subTitleText || ""}</p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+              ${(c.data || []).map((item, i) => `
+                <div style="border: 1px solid #ccc; padding: 12px; width: 200px;">
+                  <strong>${item.label || "항목"}</strong>
+                  <div>${item.percentage || 0}%</div>
+                </div>
+              `).join("")}
+            </div>
+          </section>
+        `;
+      }
+  
+      if (c.type === "섹션06") {
+        return `
+          <section>
+            <h2 style="text-align:${c.align || 'center'}">${c.titleText || ""}</h2>
+            <p style="text-align:${c.align || 'center'}">${c.subTitleText || ""}</p>
+            <ul>
+              ${(c.data || []).map((qa) => `
+                <li><strong>Q.</strong> ${qa.question}<br/><strong>A.</strong> ${qa.answer}</li>
+              `).join("")}
+            </ul>
+          </section>
+        `;
+      }
+  
+      if (c.type === "섹션02") {
+        return `
+          <section>
+            <p style="text-align:${c.align || 'center'}">${c.text || ""}</p>
+          </section>
+        `;
+      }
+  
+      // 그 외 텍스트 중심 섹션
       return `
         <section>
-          <h2 style="text-align:${c.align}">${c.titleText || ""}</h2>
-          <p style="text-align:${c.align}">${c.subTitleText || ""}</p>
-          <div class="section04-box">
-            ${(c.boxes || []).map((box) => `
-              <div class="item">
-                <div class="item-image" style="background-image:url('${box.imageClass || ""}')"></div>
-                <h3>${box.title}</h3>
-                <p>${box.subtitle}</p>
-                <p>${box.description}</p>
-              </div>
-            `).join("")}
-          </div>
+          <h2 style="text-align:${c.align || 'center'}">${c.titleText || c.title || ""}</h2>
+          <p style="text-align:${c.align || 'center'}">${c.subTitleText || c.subTitle || c.text || ""}</p>
         </section>
       `;
-    }
-
-    // 기본 섹션 (예: section02, 06, 07)
-    return `
-      <section>
-        <h2 style="text-align:${c.align || 'center'}">${c.titleText || c.title || ""}</h2>
-        <p style="text-align:${c.align || 'center'}">${c.subTitleText || c.subTitle || c.text || ""}</p>
-      </section>
-    `;
+    }).join("");
+  
+    return pageTitle + comps;
   }).join("");
+  
 
   previewWindow.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">${style}</head><body>${body}</body></html>`);
   previewWindow.document.close();
@@ -1847,34 +987,387 @@ const handlePreview = () => {
 
 
 
+
+
+
+  // ... (handleDrop, handleEdit, handleBoxEdit, handleDelete, handleSubmitOrder, handleBuild, handlePreview)
+
   return (
     <DndProvider backend={HTML5Backend}>
-      <div style={{ paddingTop: 320, background: "#222", minHeight: "100vh" }}>
-        <SlideMenu visible={true} activeTab={activeTab} setActiveTab={setActiveTab} tabItems={tabItems} />
+      <TpHeaderUser headerType={headerType}
+        user={null}
+        pages={pages}
+        menuItems={pages[currentPage]?.menuItems || defaultMenus}
+        setMenuItems={(newMenus) => {
+          setPages(prev => prev.map((p, idx) => idx === currentPage ? { ...p, menuItems: newMenus } : p));
+        }}
+        isPreview={false}
+        orderId={orderId}
+      />
+      <div style={{ paddingTop: 20, background: "#222", minHeight: "100vh" }}>
+        {/* 컴포넌트 메뉴 열기 버튼 - 하단 우측 고정 */}
+        <div style={{ position: "fixed", bottom: 40, left: 40, zIndex: 2000 }}>
+        <button
+          onClick={() => setShowMenu(prev => !prev)}
+          style={{
+            padding: "10px 24px",
+            borderRadius: "8px",
+            background: showMenu ? "#e91e63" : "#6c63ff", // ✅ 상태에 따라 배경색 변경
+            color: "#fff",
+            border: "none",
+            fontWeight: "bold",
+            fontSize: "18px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+            cursor: "pointer",
+            transition: "background 0.3s ease" // ✅ 부드러운 전환 효과
+          }}
+        >
+          {showMenu ? "컴포넌트 메뉴 닫기" : "컴포넌트 메뉴 열기"}
+        </button>
 
-        <div style={{ display: "flex", justifyContent: "center", gap: 16, padding: 20, color: "white" }}>
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" style={{ width: 200, height: 50, padding: "10px", borderRadius: "10px", border: "none", outline: "none" }} />
-          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" style={{ width: 200, height: 50, padding: "10px", borderRadius: "10px", border: "none", outline: "none" }} />
-          <button onClick={handleSubmitOrder} style={{ marginLeft: "100px", borderRadius: "10px", padding: "10px" }}>📤 Firestore 저장</button>
-          <button onClick={handleBuild} style={{ borderRadius: "10px", padding: "10px" }}>💾 HTML 다운로드</button>
-          <button onClick={handlePreview} style={{ borderRadius: "10px", padding: "10px" }}>🖥 미리보기 보기</button>
+        {/* 왼쪽 하단 고정 홈 버튼 */}
+        <div style={{
+          position: "fixed",
+          bottom: 40,
+          left: "50%",
+          transform: "translate(-50%)",
+          zIndex: 99999
+        }}>
+          <button
+            onClick={() => navigate("/")}
+            style={{
+              width: "160px",
+              padding: "10px 24px",
+              borderRadius: "8px",
+              background: "#333",
+              color: "#fff",
+              border: "none",
+              fontWeight: "bold",
+              fontSize: "16px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+              cursor: "pointer"
+            }}
+          >
+            🏠 홈으로 가기
+          </button>
         </div>
 
+        <button
+          onClick={() => setShowRightPanel(prev => !prev)}
+          style={{
+            padding: "10px 24px",
+            position: "fixed",
+            bottom: 40,
+            right: 40,
+            fontSize: "18px",
+            fontWeight: "bold",
+            zIndex: 99999,
+            borderRadius: "8px",
+            backgroundColor: showRightPanel ? "#e91e63" : "#3182f6",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer",
+            transition: "background-color 0.3s ease" // ✅ 부드러운 전환 효과
+          }}
+        >
+          {showRightPanel ? "패널 닫기" : "패널 열기"}
+        </button>
+
+        </div>
+        {/* 컴포넌트 메뉴(슬라이드/사이드바) */}
+        <AnimatePresence>
+  {showMenu && (
+    <motion.div
+      initial={{ opacity: 0, x: -50 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -50 }}
+      transition={{ duration: 0.3 }}
+      style={{
+        position: "fixed",
+        top: 200,
+        left: 40,
+        width: 360,
+        maxHeight: "90vh",
+        overflowY: "auto",
+        borderRadius: 12,
+        background: "#fff",
+        boxShadow: "0 10px 30px rgba(0,0,0,1)",
+        zIndex: 2100,
+        padding: "0px",
+        transformOrigin: "bottom right",
+      }}
+    >
+      <SlideMenu
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        tabItems={tabItems}
+      />
+    </motion.div>
+  )}
+</AnimatePresence>
+
+
+
+
         <DropCanvas
-          components={droppedComponents}
+          pages={pages}
+          components={pages[currentPage]?.components || []}
           onDrop={handleDrop}
           onDelete={handleDelete}
           onEdit={handleEdit}
           onBoxEdit={handleBoxEdit}
           onUpdate={handleUpdate}
+          orderId={orderId}
+          menuItems={pages[currentPage]?.menuItems || defaultMenus}
+          setMenuItems={(newMenus) => {
+            setPages(prev => prev.map((p, idx) => idx === currentPage ? { ...p, menuItems: newMenus } : p));
+          }}
         />
+
+
+        {showModal && (
+          <div style={{
+            position: "fixed",
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}>
+            {/* 우측 상단 고정 버튼 */}
+            <button
+              onClick={() => setShowModal(false)}
+              style={{
+                position: "fixed",
+                top: 30,
+                right: 30,
+                zIndex: 20000,
+                padding: "12px 28px",
+                borderRadius: "12px",
+                background: "#111",
+                color: "#fff",
+                border: "none",
+                cursor: "pointer",
+                fontWeight: "bold",
+                fontSize: "18px",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
+                outline: "2px solid #fff",
+                pointerEvents: "auto"
+              }}
+            >
+              제작페이지로 돌아가기
+            </button>
+            <div style={{
+              background: "white",
+              padding: 30,
+              borderRadius: 10,
+              width: "500px",
+              maxHeight: "80vh",
+              overflowY: "auto",
+            }}>
+              <h2>🔎 사이트 불러오기</h2>
+              <button
+                onClick={handleDeleteAllSites}
+                style={{
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  background: "#f33",
+                  color: "white",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                }}
+              >
+                🗑 전체 삭제
+              </button>
+              <ul style={{ listStyle: "none", padding: 0 }}>
+                {savedSites.map((site) => (
+                  <li key={site.id} style={{
+                    padding: "12px 0",
+                    borderBottom: "1px solid #ddd",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}>
+                    <div>
+                      <strong>{site.user?.name || "이름없음"}</strong>  
+                      <div style={{ fontSize: "12px", color: "#666" }}>
+                        {site.user?.email || "이메일없음"}
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      {/* 선택 버튼 */}
+                      <button
+                        onClick={() => handleSelectSite(site)}
+                        style={{
+                          padding: "8px 12px",
+                          border: "none",
+                          borderRadius: "6px",
+                          background: "black",
+                          color: "white",
+                          cursor: "pointer",
+                        }}
+                      >
+                        선택
+                      </button>
+
+                      {/* 삭제 버튼 추가 */}
+                      <button
+                        onClick={() => handleDeleteSite(site.id)}
+                        style={{
+                          padding: "8px 12px",
+                          border: "none",
+                          borderRadius: "6px",
+                          background: "#f33",
+                          color: "white",
+                          cursor: "pointer",
+                        }}
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <div style={{ textAlign: "center", marginTop: 20 }}>
+                <button
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "8px",
+                    background: "#eee",
+                    border: "none",
+                    cursor: "pointer",
+                    marginRight: "10px"
+                  }}
+                >
+                  닫기
+                </button>
+                <button
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "8px",
+                    background: "#222",
+                    color: "#fff",
+                    border: "none",
+                    cursor: "pointer"
+                  }}
+                >
+                  제작페이지로 돌아가기
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 상단 컨트롤 UI 복구 */}
+
+<AnimatePresence>
+  {showRightPanel && (
+    <motion.div
+      key="right-panel"
+      initial={{ x: 50, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: 50, opacity: 0 }}
+      transition={{ duration: 0.3}}
+      style={{
+        position: "fixed",
+        top: 200,
+        right: 40,
+        width: 320,
+        backgroundColor: "#fff",
+        borderRadius: "10px",
+        padding: "20px",
+        zIndex: 99998,
+        boxSizing: "border-box"
+      }}
+    >
+      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" style={{marginBottom:"10px", width: "100%", height: "50px", padding: "10px", borderRadius: "10px", border: "none", outline: "none" }} />
+      <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" style={{marginBottom:"10px", width: "100%", height: "50px", padding: "10px", borderRadius: "10px", border: "none", outline: "none" }} />
+      <button onClick={handleSubmitOrder} style={{ borderRadius: "10px", padding: "10px" }}>Firestore 저장</button>
+      <button onClick={fetchSavedSites} style={{ borderRadius: "10px", padding: "10px" }}>사이트 불러오기</button>
+
+      <div style={{ textAlign: "center", margin: "20px 0" }}>
+        {pages.map((_, index) => (
+          <div key={index} style={{ display: "inline-block", margin: "0 4px", position: "relative" }}>
+            <button
+              onClick={() => setCurrentPage(index)}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: index === currentPage ? "#000" : "#ccc",
+                color: index === currentPage ? "#fff" : "#000",
+                border: "none",
+                borderRadius: 4,
+              }}
+            >
+              페이지 {index + 1}
+            </button>
+            {pages.length > 1 && (
+              <button
+                onClick={() => {
+                  const newPages = pages.filter((_, i) => i !== index);
+                  setPages(newPages);
+                  if (currentPage >= newPages.length) {
+                    setCurrentPage(newPages.length - 1);
+                  }
+                }}
+                style={{
+                  position: "absolute",
+                  top: -10,
+                  right: -10,
+                  background: "#f33",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: 20,
+                  height: 20,
+                  fontSize: 12,
+                  lineHeight: "20px",
+                  cursor: "pointer",
+                }}
+              >
+                ×
+              </button>
+            )}
+          </div>
+        ))}
+        <button
+          onClick={() => {
+            const headerComp = pages.find(page => page.components.some(c => c.type === "헤더02"))?.components.find(c => c.type === "헤더02");
+            setPages([
+              ...pages,
+              {
+                id: Date.now(),
+                components: headerComp ? [ { ...headerComp, id: Date.now() + Math.random() } ] : [],
+                menuItems: defaultMenus
+              }
+            ]);
+            setCurrentPage(pages.length);
+          }}
+          style={{
+            padding: "8px 16px",
+            marginLeft: 8,
+            border: "1px dashed #888",
+            borderRadius: 4,
+            backgroundColor: "#eee",
+          }}
+        >
+          + 페이지 추가
+        </button>
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
+
       </div>
     </DndProvider>
   );
 }
 
 export default TpPage03;
-
-
-
-
