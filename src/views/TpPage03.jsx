@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { useRef } from "react";
 import { saveAs } from "file-saver";
 import { db } from "../firebase";
 import { ScrollTrigger } from "gsap/ScrollTrigger"; // 이미 있는 경우 생략 가능
@@ -57,8 +58,9 @@ const ComponentItem = ({ type, label, previewImage, previewVideo }) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
+        height: "350px",
         background: "#fff",
-        padding: 20,
+        padding: "15px 10px 40px 10px",
         marginBottom: "10px",
         cursor: "grab",
         borderBottom: "1px solid #ccc",
@@ -73,17 +75,15 @@ const ComponentItem = ({ type, label, previewImage, previewVideo }) => {
         {label}
       </div>
 
-      {/* 이미지/영상 프리뷰 */}
       <div
         style={{
           width: "100%",
-          height: 180,
+          height: "100%",
           borderRadius: 8,
           overflow: "hidden",
           position: "relative",
         }}
       >
-        {/* 이미지 또는 영상 미리보기 */}
         {previewImage && (
           <img
             src={previewImage}
@@ -93,7 +93,7 @@ const ComponentItem = ({ type, label, previewImage, previewVideo }) => {
               height: "100%",
               objectFit: "cover",
               transition: "transform 0.4s ease-in-out",
-              transform: hovered ? "scale(1.05)" : "scale(1)",
+              transform: "scale(1)", // 더 이상 확대 X
             }}
           />
         )}
@@ -110,14 +110,38 @@ const ComponentItem = ({ type, label, previewImage, previewVideo }) => {
               height: "100%",
               objectFit: "cover",
               transition: "transform 0.4s ease-in-out",
-              transform: hovered ? "scale(1.05)" : "scale(1)",
+              transform: "scale(1)", // 더 이상 확대 X
             }}
           />
         )}
+
+        {/* 오버레이 및 문구 */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: hovered ? "rgba(0,0,0,0.6)" : "transparent",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 24,
+            fontWeight: "500",
+            opacity: hovered ? 1 : 0,
+            transition: "opacity 0.5s ease, background-color 0.5s ease",
+            pointerEvents: "none", // 클릭 방지
+          }}
+        >
+          필요한 요소를 드래그해서 추가하세요!      
+        </div>
       </div>
     </div>
   );
 };
+
 
 
 
@@ -170,7 +194,7 @@ const SlideMenu = ({ activeTab, setActiveTab, tabItems }) => {
           exit={{ opacity: 0, y: 0 }}
           transition={{ duration: 0.3 }}
           style={{
-            height: "500px",
+            height: "550px",
             overflowY: "auto",
             padding: 20,
             background: "#f9f9f9",
@@ -194,6 +218,7 @@ const SlideMenu = ({ activeTab, setActiveTab, tabItems }) => {
 
 
 const DropCanvas = ({
+  canvasWidth, // ✅ 여기 추가
   components,
   onDrop,
   onDelete,
@@ -203,93 +228,151 @@ const DropCanvas = ({
   pages,
   orderId,
   menuItems,
-  setMenuItems
+  setMenuItems,
+  removingIndex // ✅ props로 받기
 }) => {
   const DropZone = ({ index }) => {
     const [{ isOver }, dropRef] = useDrop(() => ({
+
+
+
+      
       accept: "COMPONENT",
       drop: (item) => onDrop(item, index),
       collect: (monitor) => ({ isOver: monitor.isOver() }),
     }));
 
     return (
-      <div
-        ref={dropRef}
-        style={{
-          height: 40,
-          border: "2px dashed #fff",
-          margin: "10px 0",
-          background: isOver ? "#444" : "transparent",
-        }}
-      />
+      <>
+        {/* <p 
+          style={{
+            color:"#fff",
+            fontSize:"40px",
+            fontWeight:"600",
+            textAlign:"center",
+            marginBottom:"60px",
+            marginTop:"100px"
+        }}>
+          + 원하는 컴포넌트를 하단에 추가하세요!
+        </p> */}
+        <div
+          ref={dropRef}
+          style={{
+            height: 50,
+            border: "2px dashed #fff",
+            borderRadius: "10px",
+            margin: "10px 0",
+            background: isOver ? "#444" : "transparent",
+          }}
+        />
+      </>  
     );
   };
 
   return (
-    <div
-      style={{
-        flex: 1,
-        padding: "0 20px",
-        background: "#222",
-        minHeight: 400,
-        paddingTop: 200,
-        zIndex: 1,
-      }}
-    >
-      {/* 헤더를 제외한 컴포넌트만 렌더링 */}
-      {components
-        .filter((comp) => !comp.type.startsWith("헤더"))
-        .map((comp, i) => {
-          const Comp = componentMap[comp.type];
-          return (
-            <React.Fragment key={comp.id ?? i}>
-              <DropZone index={i} />
-              <AnimatePresence>
-                <motion.div
-                  key={comp.id ?? i}
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 40 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                  style={{
-                    border: "2px dashed white",
-                    marginBottom: 20,
-                    position: "relative",
-                  }}
-                >
-                  <Comp
-                    {...comp}
-                    pages={pages}
-                    orderId={orderId}
-                    onEdit={(newData) => onEdit(i, newData)}
-                    onBoxEdit={(updatedData) => onBoxEdit(i, updatedData)}
-                    onUpdate={(updatedData) => onUpdate(i, updatedData)}
-                    {...(comp.type === "헤더02"
-                      ? { menuItems, setMenuItems }
-                      : {})}
-                  />
-                  <button
-                    onClick={() => onDelete(i)}
-                    style={{
-                      position: "absolute",
-                      top: 10,
-                      right: 10,
-                      background: "#f33",
-                      color: "#fff",
-                      border: "none",
-                      padding: "8px 16px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    삭제
-                  </button>
-                </motion.div>
-              </AnimatePresence>
-            </React.Fragment>
-          );
-        })}
-      <DropZone index={components.length} />
-    </div>
+    <>
+      <h3
+        style={{
+          marginTop:350,
+          color:"#fff",
+          fontSize:"40px",
+          textAlign:"center",
+          marginBottom:"60px"
+        }}
+      >
+        원하는 컴포넌트를 하단에 넣어주세요 ↓
+      </h3>
+      {/* 외부 컨테이너: 중앙 정렬 + 배경 */}
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          background: "#222",
+          minHeight: 400,
+          paddingBottom: 200,
+          zIndex: 1,
+          transition: "all 0.4s ease"
+        }}
+      >
+        {/* 내부 너비 조절 컨테이너 */}
+        <div
+          style={{
+            width: canvasWidth, // props로 받은 값
+            padding: "0 20px",
+            transition: "width 0.4s ease"
+          }}
+        >
+          {/* 헤더를 제외한 컴포넌트만 렌더링 */}
+          {components
+            .filter((comp) => !comp.type.startsWith("헤더"))
+            .map((comp, i) => {
+              const Comp = componentMap[comp.type];
+              return (
+                <React.Fragment key={comp.id ?? i}>
+                  <DropZone index={i} />
+                  <AnimatePresence>
+                    {removingIndex !== i && (
+                      <motion.div
+                        key={comp.id ?? i}
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{
+                          opacity: 0,
+                          scale: 0.7,
+                          y: 40,
+                          filter: "blur(6px)",
+                          transition: { duration: 0.5, ease: "easeInOut" }
+                        }}
+                        style={{
+                          border: "2px dashed white",
+                          borderRadius: "10px",
+                          marginBottom: 20,
+                          position: "relative",
+                        }}
+                      >
+                        <Comp
+                          {...comp}
+                          pages={pages}
+                          orderId={orderId}
+                          onEdit={(newData) => onEdit(i, newData)}
+                          onBoxEdit={(updatedData) => onBoxEdit(i, updatedData)}
+                          onUpdate={(updatedData) => onUpdate(i, updatedData)}
+                          {...(comp.type === "헤더02"
+                            ? { menuItems, setMenuItems }
+                            : {})}
+                        />
+                        <button
+                          onClick={() => onDelete(i)}
+                          style={{
+                            zIndex:"1000",
+                            position: "absolute",
+                            top: 20,
+                            right: 20,
+                            fontSize: "20px",
+                            fontWeight: "500",
+                            background: "#f33",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "8px",
+                            padding: "12px 22px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          제거하기
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </React.Fragment>
+              );
+            })}
+
+          <DropZone index={components.length} />
+        </div>
+      </div>
+
+    </>
   );
 };
 
@@ -302,7 +385,7 @@ const defaultMenus = [
 ];
 
 function TpPage03() {
-
+  const [canvasWidth, setCanvasWidth] = useState("100%"); // 초기값은 PC용
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const initialPage = parseInt(queryParams.get("page") || "0", 10);
@@ -313,7 +396,8 @@ function TpPage03() {
   const [products, setProducts] = useState([]);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [activeTab, setActiveTab] = useState("인트로배너");
+  const [activeTab, setActiveTab] = useState("상단메뉴");
+  const [removingIndex, setRemovingIndex] = useState(null); // ✅ 이거 추가해줘!
   const navigate = useNavigate(); // TpPage03 안에서 선언
   // 🔥 Firestore에서 저장된 컴포넌트 가져오기
   const [savedSites, setSavedSites] = useState([]); // 🔥 저장된 사이트 리스트
@@ -321,6 +405,17 @@ function TpPage03() {
   const [showMenu, setShowMenu] = useState(false);
   const [headerType, setHeaderType] = useState("헤더02");
   const [showRightPanel, setShowRightPanel] = useState(false); // 👉 추가
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    if (canvasRef.current) {
+      // ⚠️ 강제 리플로우: layout 강제로 다시 계산
+      canvasRef.current.getBoundingClientRect();
+  
+      // ScrollTrigger 등 레이아웃 관련 처리 새로고침
+      ScrollTrigger.refresh();
+    }
+  }, [canvasWidth]);
+  
   // Firestore 초기화 확인
   useEffect(() => {
     if (!db) {
@@ -543,22 +638,34 @@ const handleDeleteAllSites = async () => {
       ScrollTrigger.refresh();
     }, 500); // DOM이 안정화되고 나서 실행
   }, [pages, headerType]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 200);
+  }, [canvasWidth]);
   
   // ✅ 여기서부터는 기존 TpPage03 코드 그대로 작성하면 됩니다
   
   const tabItems = {
-    인트로배너: [
-      { type: "배너04", label: "배너04", previewImage: "/preview/banner04.jpg" },
+    상단메뉴: [
       { type: "헤더01", label: "헤더 01", previewImage: "/preview/header01.jpg" },
       { type: "헤더02", label: "헤더 02", previewImage: "/preview/header02.jpg" },
       { type: "헤더03", label: "헤더 03", previewImage: "/preview/header03.jpg" },
       { type: "헤더04", label: "헤더 04", previewImage: "/preview/header04.jpg" },
+    ],
+    메인배너: [
+      { type: "배너04", label: "배너04", previewImage: "/images/배너04이미지.png" },
+      // { type: "헤더01", label: "헤더 01", previewImage: "/preview/header01.jpg" },
+      // { type: "헤더02", label: "헤더 02", previewImage: "/preview/header02.jpg" },
+      // { type: "헤더03", label: "헤더 03", previewImage: "/preview/header03.jpg" },
+      // { type: "헤더04", label: "헤더 04", previewImage: "/preview/header04.jpg" },
       { type: "배너Swiper", label: "배너 스와이퍼", previewImage: "/images/add_01.png" },
     ],
-    중간섹션: [
-      { type: "섹션02", label: "섹션02", previewImage: "/preview/section02.jpg" },
+    콘텐츠영역: [
+      { type: "섹션02", label: "섹션02", previewImage: "/images/섹션02이미지.png" },
       { type: "섹션04", label: "섹션04", previewVideo: "/preview/section04.mp4" },
-      { type: "섹션06", label: "섹션06", previewImage: "/preview/section06.jpg" },
+      { type: "섹션06", label: "섹션06", previewImage: "/images/섹션06이미지.png" },
       { type: "섹션07", label: "섹션07", previewImage: "/preview/section07.jpg" },
       // ...
     ]
@@ -717,17 +824,23 @@ const handleUpdate = (index, updatedData) => {
 
 
 const handleDelete = (index) => {
-  setPages((prevPages) => {
-    const updatedPages = [...prevPages];
-    const newComponents = [...updatedPages[currentPage].components];
-    newComponents.splice(index, 1);
-    updatedPages[currentPage] = {
-      ...updatedPages[currentPage],
-      components: newComponents,
-    };
-    return updatedPages;
-  });
+  setRemovingIndex(index); // 삭제 중 표시
+
+  setTimeout(() => {
+    setPages((prevPages) => {
+      const updatedPages = [...prevPages];
+      const newComponents = [...updatedPages[currentPage].components];
+      newComponents.splice(index, 1); // 0.5초 후 진짜 삭제
+      updatedPages[currentPage] = {
+        ...updatedPages[currentPage],
+        components: newComponents,
+      };
+      return updatedPages;
+    });
+    setRemovingIndex(null); // 삭제 끝났으니 초기화
+  }, 500); // 애니메이션 보여줄 시간
 };
+
 
   const removeUndefined = (obj) => {
     if (Array.isArray(obj)) {
@@ -1010,14 +1123,14 @@ const handlePreview = () => {
         <button
           onClick={() => setShowMenu(prev => !prev)}
           style={{
-            padding: "10px 24px",
+            padding: "14px 24px",
             borderRadius: "8px",
-            background: showMenu ? "#e91e63" : "#6c63ff", // ✅ 상태에 따라 배경색 변경
+            background: showMenu ? "#e91e63" : "#3182f6", // ✅ 상태에 따라 배경색 변경
             color: "#fff",
             border: "none",
-            fontWeight: "bold",
+            fontWeight: "400",
             fontSize: "18px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
             cursor: "pointer",
             transition: "background 0.3s ease" // ✅ 부드러운 전환 효과
           }}
@@ -1028,7 +1141,7 @@ const handlePreview = () => {
         {/* 왼쪽 하단 고정 홈 버튼 */}
         <div style={{
           position: "fixed",
-          bottom: 40,
+          bottom: 70,
           left: "50%",
           transform: "translate(-50%)",
           zIndex: 99999
@@ -1048,19 +1161,51 @@ const handlePreview = () => {
               cursor: "pointer"
             }}
           >
-            🏠 홈으로 가기
+            홈으로 가기
           </button>
+        </div>
+        <div style={{
+          position: "fixed",
+          bottom: 20,
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          gap: "12px",
+          zIndex: 9999
+        }}>
+          {[
+            { label: "PC", width: "100%" },
+            { label: "태블릿", width: "800px" },
+            { label: "모바일", width: "420px" },
+          ].map(({ label, width }) => (
+            <button
+              key={label}
+              onClick={() => setCanvasWidth(width)}
+              style={{
+                padding: "10px 20px",
+                borderRadius: "8px",
+                background: "#000",
+                color: "#fff",
+                fontWeight: "bold",
+                border: "none",
+                cursor: "pointer",
+                transition: "all 0.3s ease"
+              }}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
         <button
           onClick={() => setShowRightPanel(prev => !prev)}
           style={{
-            padding: "10px 24px",
+            padding: "14px 24px",
             position: "fixed",
             bottom: 40,
             right: 40,
             fontSize: "18px",
-            fontWeight: "bold",
+            fontWeight: "400",
             zIndex: 99999,
             borderRadius: "8px",
             backgroundColor: showRightPanel ? "#e91e63" : "#3182f6",
@@ -1077,55 +1222,72 @@ const handlePreview = () => {
         </div>
         {/* 컴포넌트 메뉴(슬라이드/사이드바) */}
         <AnimatePresence>
-  {showMenu && (
-    <motion.div
-      initial={{ opacity: 0, x: -50 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -50 }}
-      transition={{ duration: 0.3 }}
-      style={{
-        position: "fixed",
-        top: 200,
-        left: 40,
-        width: 360,
-        maxHeight: "90vh",
-        overflowY: "auto",
-        borderRadius: 12,
-        background: "#fff",
-        boxShadow: "0 10px 30px rgba(0,0,0,1)",
-        zIndex: 2100,
-        padding: "0px",
-        transformOrigin: "bottom right",
-      }}
-    >
-      <SlideMenu
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        tabItems={tabItems}
-      />
-    </motion.div>
-  )}
-</AnimatePresence>
+          {showMenu && (
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                position: "fixed",
+                top: 200,
+                left: 40,
+                width: activeTab === "상단메뉴" ? 900 : 700,                 
+                maxHeight: "90vh",
+                overflowY: "auto",
+                borderRadius: 12,
+                background: "#fff",
+                boxShadow: "0 10px 30px rgba(0,0,0,1)",
+                zIndex: 2100,
+                padding: "0px",
+                transformOrigin: "bottom right",
+                transition: "width 0.3s ease"
+              }}
+            >
+              <SlideMenu
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                tabItems={tabItems}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-
-
-
-        <DropCanvas
-          pages={pages}
-          components={pages[currentPage]?.components || []}
-          onDrop={handleDrop}
-          onDelete={handleDelete}
-          onEdit={handleEdit}
-          onBoxEdit={handleBoxEdit}
-          onUpdate={handleUpdate}
-          orderId={orderId}
-          menuItems={pages[currentPage]?.menuItems || defaultMenus}
-          setMenuItems={(newMenus) => {
-            setPages(prev => prev.map((p, idx) => idx === currentPage ? { ...p, menuItems: newMenus } : p));
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={canvasWidth} // 또는 상태가 바뀔 때 trigger 역할
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+          style={{
+            width: `${canvasWidth}`,
+            margin: "0 auto",
+            transition: "width 0.4s ease", // ✅ 추가
           }}
-        />
-
-
+        >
+        <figure
+          key={canvasWidth} // ✅ canvasWidth가 바뀌면 figure를 강제 리렌더링
+          ref={canvasRef}
+ 
+        >
+          <DropCanvas
+            canvasWidth={canvasWidth}
+            pages={pages}
+            components={pages[currentPage]?.components || []}
+            onDrop={handleDrop}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+            onBoxEdit={handleBoxEdit}
+            onUpdate={handleUpdate}
+            orderId={orderId}
+            removingIndex={removingIndex} // ✅ 여기!
+            menuItems={pages[currentPage]?.menuItems || defaultMenus}
+            setMenuItems={(newMenus) => {
+              setPages(prev => prev.map((p, idx) => idx === currentPage ? { ...p, menuItems: newMenus } : p));
+            }}
+          />
+        </figure>
         {showModal && (
           <div style={{
             position: "fixed",
@@ -1264,8 +1426,8 @@ const handlePreview = () => {
             </div>
           </div>
         )}
-
-        {/* 상단 컨트롤 UI 복구 */}
+  </motion.div>
+  </AnimatePresence>       {/* 상단 컨트롤 UI 복구 */}
 
 <AnimatePresence>
   {showRightPanel && (

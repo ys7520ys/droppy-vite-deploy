@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../firebase";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+gsap.registerPlugin(ScrollTrigger);
 
-// ✅ 배너 수정 모달 컴포넌트
+// ✅ 배너 수정 모달
 const EditBannerModal = ({ localData, onChange, onClose }) => {
   const [localTitle, setLocalTitle] = useState(localData.title || "");
   const [localSubTitle, setLocalSubTitle] = useState(localData.subTitle || "");
@@ -25,7 +28,6 @@ const EditBannerModal = ({ localData, onChange, onClose }) => {
   const handleMediaUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const previewURL = URL.createObjectURL(file);
     setMediaSrc(previewURL);
 
@@ -134,31 +136,68 @@ const EditBannerModal = ({ localData, onChange, onClose }) => {
   );
 };
 
-// ✅ 메인 배너 컴포넌트
+// ✅ TpBanner04 메인 컴포넌트
 const TpBanner04 = ({ title, subTitle, align, mediaUrl, mediaType, buttonText, onUpdate, isPreview = false }) => {
-  const initialData = {
+  const sectionRef = useRef(null);
+  const [bannerData, setBannerData] = useState({
     title: title || "건강한 하루의 시작",
     subTitle: subTitle || "신선한 재료로 만들어지는 건강한 습관",
     align: align || "center",
     mediaUrl: mediaUrl || "videos/1757799-hd_1920_1080_25fps.mp4",
     mediaType: mediaType || "video",
     buttonText: buttonText || "지금 문의하기",
-  };
-
-  const [bannerData, setBannerData] = useState(initialData);
+  });
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     onUpdate?.(bannerData);
   }, []);
 
+  // ✅ 반응형 클래스 적용
+  useEffect(() => {
+    const updateResponsiveClass = () => {
+      if (!sectionRef.current) return;
+      const width = sectionRef.current.clientWidth;
+      sectionRef.current.classList.remove("is-mobile", "is-tablet", "is-pc");
+      if (width <= 768) {
+        sectionRef.current.classList.add("is-mobile");
+      } else if (width <= 1200) {
+        sectionRef.current.classList.add("is-tablet");
+      } else {
+        sectionRef.current.classList.add("is-pc");
+      }
+    };
+
+    updateResponsiveClass();
+    window.addEventListener("resize", updateResponsiveClass);
+    return () => window.removeEventListener("resize", updateResponsiveClass);
+  }, []);
+
+  // ✅ ScrollTrigger 애니메이션
+  useLayoutEffect(() => {
+    if (!sectionRef.current || editing) return;
+    const ctx = gsap.context(() => {
+      gsap.from(".tpBanner04__text .title", {
+        opacity: 0,
+        y: 60,
+        duration: 0.8,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 80%",
+        },
+      });
+    }, sectionRef);
+    return () => ctx.revert();
+  }, [editing]);
+
   return (
     <section
       className="tpBanner04"
+      ref={sectionRef}
       onClick={() => {
         if (!isPreview) setEditing(true);
       }}
-      style={{ position: "relative", overflow: "hidden" }}
     >
       {bannerData.mediaType === "video" ? (
         <video
@@ -168,65 +207,36 @@ const TpBanner04 = ({ title, subTitle, align, mediaUrl, mediaType, buttonText, o
           muted
           playsInline
           className="tpBanner04__background"
-          style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", top: 0, left: 0, zIndex: 1 }}
         >
           <source src={bannerData.mediaUrl} type="video/mp4" />
         </video>
       ) : (
         <div
           className="tpBanner04__background"
-          style={{
-            backgroundImage: `url(${bannerData.mediaUrl})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            zIndex: 1,
-            filter: "brightness(80%)",
-          }}
+          style={{ backgroundImage: `url(${bannerData.mediaUrl})` }}
         />
       )}
 
-      <div
-        className="tpBanner04__text"
-        style={{
-          position: "relative",
-          zIndex: 2,
-          textAlign: bannerData.align,
-          top: "50%",
-          transform: "translateY(-50%)",
-          color: "#fff",
-          padding: "0 20px",
-        }}
-      >
-        <h2 className="title" style={{ fontSize: "3.5rem", marginBottom: "1rem" }}>{bannerData.title}</h2>
-        <p className="subTitle" style={{ fontSize: "1.4rem", marginBottom: "3rem" }}>{bannerData.subTitle}</p>
-        <button
-          className="btn"
-          style={{
-            padding: "12px 24px",
-            fontSize: "1rem",
-            backgroundColor: "#007bff",
-            border: "none",
-            borderRadius: "30px",
-            color: "#fff",
-            cursor: "pointer",
-          }}
-        >
-          {bannerData.buttonText}
-        </button>
+      <div className="tpBanner04__text" style={{ textAlign: bannerData.align }}>
+        <h2 className="title">
+          {bannerData.title.split("\n").map((line, i) => (
+            <span key={i}>{line}<br /></span>
+          ))}
+        </h2>
+        <p className="subTitle">
+          {bannerData.subTitle.split("\n").map((line, i) => (
+            <span key={i}>{line}<br /></span>
+          ))}
+        </p>
+        <button className="btn">{bannerData.buttonText}</button>
       </div>
 
       {editing && (
         <EditBannerModal
           localData={bannerData}
           onChange={(newData) => {
-            setBannerData(newData);  // 🔥 로컬 상태 변경
-            onUpdate?.(newData);     // 🔥 부모 컴포넌트(TpPage03) 업데이트 호출
+            setBannerData(newData);
+            onUpdate?.(newData);
           }}
           onClose={() => setEditing(false)}
         />
@@ -236,5 +246,6 @@ const TpBanner04 = ({ title, subTitle, align, mediaUrl, mediaType, buttonText, o
 };
 
 export default TpBanner04;
+
 
 

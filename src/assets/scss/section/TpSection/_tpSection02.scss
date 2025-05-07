@@ -153,141 +153,151 @@
 // }
 
 .tpSection02 {
-    height: 100vh;
-    padding: 180px 20px 50px;
-    background-color: #222222;
-  
-    @media (max-width: 700px) {
-      padding: 100px 20px;
-    }
-  
-    &__title {
-      @include fontLineStyle;
+  height: 100vh;
+  padding: 180px 20px 50px;
+  background-color: #222222;
+
+  &.is-mobile {
+    padding: 100px 20px;
+    height: auto;
+  }
+
+  &__title {
+    @include fontLineStyle;
+    font-size: 45px;
+    color: white;
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 60px;
+    transition: font-size 0.3s ease;
+
+    .is-pc & {
       font-size: 45px;
-      color: white;
-      text-align: center;
-      font-weight: 700;
-      margin-bottom: 60px;
-      transition: font-size 0.3s ease;
-  
-      @media (max-width: 1260px) {
-        font-size: 40px;
-      }
-      @media (max-width: 960px) {
-        font-size: 34px;
-      }
-      @media (max-width: 700px) {
-        font-size: 24px;
-        margin-bottom: 30px;
-      }
     }
-  
-    @media (max-width: 960px) {
-      height: auto;
+    .is-tablet & {
+      font-size: 34px;
     }
-  
-    &__mainBox {
-      max-width: 1260px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      gap: 30px;
+    .is-mobile & {
+      font-size: 24px;
+      margin-bottom: 30px;
+    }
+  }
+
+  &__mainBox {
+    max-width: 1260px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    height: 420px;
+
+    .is-pc & {
+      flex-direction: row;
       height: 420px;
-  
-      @media (max-width: 1260px) {
-        height: auto;
-      }
-      @media (max-width: 960px) {
-        flex-direction: column;
-        width: 500px;
-        gap: 20px;
-      }
-      @media (max-width: 700px) {
+    }
+
+    .is-tablet &,
+    .is-mobile & {
+      flex-direction: column;
+      height: auto;
+      width: 100%;
+      gap: 20px;
+    }
+
+    .subBox {
+      background-color: #333;
+      border-radius: 10px;
+      width: 33.3333%;
+      padding: 40px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      color: white;
+
+      .is-tablet &,
+      .is-mobile & {
         width: 100%;
+        margin: 0 auto;
       }
-  
-      .subBox {
-        background-color: #333;
-        border-radius: 10px;
-        width: 33.3333%;
-        padding: 40px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
+      .is-tablet & {
+        padding: 60px 50px;
+      }
+
+      .is-mobile & {
+        padding: 20px 30px;
+      }
+
+      .numText {
+        font-size: 35px;
+        font-weight: 600;
+        margin-bottom: 15px;
+
+        .is-tablet & {
+          font-size: 28px;
+        }
+
+        .is-mobile & {
+          font-size: 24px;
+          margin-bottom: 10px;
+        }
+      }
+
+      .titleText {
+        @include fontLineStyle;
+        font-size: 26px;
+        font-weight: 700;
+        margin-bottom: 40px;
+
+        .is-tablet & {
+          font-size: 30px;
+        }
+
+        .is-mobile & {
+          font-size: 20px;
+          margin-bottom: 20px;
+        }
+      }
+
+      hr {
+        border: solid 1px white;
+        border-radius: 3px;
+        margin-bottom: 15px;
+
+        .is-mobile & {
+          border-width: 0.5px;
+        }
+      }
+
+      .subTitleText {
+        @include fontLineStyle;
+        font-size: 16px;
+        font-weight: 500;
         color: white;
-  
-        @media (max-width: 960px) {
-          width: 100%;
-          padding: 60px 50px;
-          margin: 0 auto;
+
+        .is-tablet & {
+          font-size: 15px;
         }
-        @media (max-width: 700px) {
-          width: 100%;
-          padding: 20px 30px;
+
+        .is-mobile & {
+          font-size: 14px;
         }
-  
-        .numText {
-          font-size: 35px;
-          font-weight: 600;
-          margin-bottom: 15px;
-  
-          @media (max-width: 960px) {
-            font-size: 28px;
-          }
-          @media (max-width: 700px) {
-            font-size: 24px;
-            margin-bottom: 10px;
-          }
-        }
-  
-        .titleText {
-          @include fontLineStyle;
-          font-size: 26px;
-          font-weight: 700;
-          margin-bottom: 40px;
-  
-          @media (max-width: 960px) {
-            font-size: 30px;
-          }
-          @media (max-width: 700px) {
-            font-size: 20px;
-            margin-bottom: 20px;
-          }
-        }
-  
-        hr {
-          border: solid 1px white;
-          border-radius: 3px;
-          margin-bottom: 15px;
-  
-          @media (max-width: 700px) {
-            border-width: 0.5px;
-          }
-        }
-  
-        .subTitleText {
-          @include fontLineStyle;
+
+        p {
+          margin-bottom: 10px;
+          line-height: 1.6;
           font-size: 16px;
-          font-weight: 500;
-          color: white;
-  
-          @media (max-width: 960px) {
-            font-size: 15px;
-          }
-          @media (max-width: 700px) {
+          color: #cccccc;
+
+          .is-tablet & {
             font-size: 14px;
           }
-  
-          p {
-            margin-bottom: 10px;
-            line-height: 1.6;
-            font-size: 16px;
-            color: #cccccc;
-  
-            @media (max-width: 960px) {
-              font-size: 14px;
-            }
+
+          .is-mobile & {
+            font-size: 13px;
           }
         }
       }
     }
   }
+}
+
   

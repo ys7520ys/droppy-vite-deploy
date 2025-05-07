@@ -59,7 +59,7 @@
 
 
 // ✅ LoginPage.jsx (Firebase 이메일/비밀번호 로그인 + setUser 반영)
-import React, { useState } from "react";
+import React, { useEffect,useState } from "react";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth, googleProvider } from "../firebase";
@@ -103,43 +103,47 @@ const LoginPage = ({ setUser }) => {
       alert("구글 로그인에 실패했습니다.");
     }
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0); // ✅ 페이지 상단으로 이동
+  }, []);
   return (
-    <div style={{ maxWidth: 400, margin: "0 auto", padding: "100px 50px", border: "1px solid #ccc", borderRadius: 8 }}>
-      <h2>로그인</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="이메일"
-          required
-          style={{ width: "100%", marginBottom: 10, padding: 10 }}
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="비밀번호"
-          required
-          style={{ width: "100%", marginBottom: 10, padding: 10 }}
-        />
-        <button
-          type="submit"
-          style={{ width: "100%", padding: 10, background: "#000", color: "white" }}
-        >
-          로그인
-        </button>
-        <button
-          type="button"
-          onClick={handleGoogleLogin}
-          style={{ width: "100%", padding: 10, marginTop: 12, background: "#4285F4", color: "#fff" }}
-        >
-          Google 계정으로 로그인
-        </button>
-      </form>
-      {error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
-      {/* <NaverLogin /> */}
+    <div style={{height:"100vh",display:"flex",justifyContent:"center",alignItems:"center"}}>
+      <div style={{ maxWidth: 380, margin: "0 auto", padding: "60px 30px", border: "1px solid #ccc", borderRadius: 8, backgroundColor:"#fff" }}>
+        <h2>로그인</h2>
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="이메일"
+            required
+            style={{fontSize:"14px", width: "100%",marginTop:20, marginBottom: 15, padding: 15, border:"none", backgroundColor:"#f5f5f5",borderRadius:"8px" }}
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="비밀번호"
+            required
+            style={{fontSize:"14px", width: "100%", marginBottom: 10, padding: 15, border:"none", backgroundColor:"#f5f5f5",borderRadius:"8px", marginBottom:"30px" }}
+          />
+          <button
+            type="submit"
+            style={{ width: "100%", padding: 10, background: "#000", color: "white",borderRadius:"8px",border:"none" }}
+          >
+            로그인
+          </button>
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            style={{ width: "100%", padding: 10, marginTop: 12, background: "#4285F4", color: "#fff",borderRadius:"8px",border:"none" }}
+          >
+            Google 계정으로 로그인
+          </button>
+        </form>
+        {error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
+        {/* <NaverLogin /> */}
+      </div>
     </div>
   );
 };

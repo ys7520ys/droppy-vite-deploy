@@ -41,9 +41,7 @@ const TpPagePreview = () => {
   const pages = location.state?.pages || [];
   const headerType = location.state?.headerType || "헤더02";
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  const menuItems = pages[currentPageIndex]?.menuItems || [];
 
-  // 페이지 번호 읽기
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const pageFromQuery = parseInt(queryParams.get("page"), 10);
@@ -52,9 +50,14 @@ const TpPagePreview = () => {
     }
   }, [location.search]);
 
-  // 현재 페이지 컴포넌트 중 헤더 제외
-  const currentComponents =
-    pages[currentPageIndex]?.components.filter((c) => c.type !== "헤더02") || [];
+  const isValidPage = currentPageIndex >= 0 && currentPageIndex < pages.length;
+
+  // ✅ fallback 메뉴도 항상 보장
+  const menuItems = pages[currentPageIndex]?.menuItems ?? pages[0]?.menuItems ?? [];
+
+  const currentComponents = isValidPage
+    ? pages[currentPageIndex]?.components.filter((c) => c.type !== "헤더02") || []
+    : [];
 
   return (
     <div style={{ background: "#222222", minHeight: "100vh", paddingTop: "80px" }}>
@@ -79,6 +82,7 @@ const TpPagePreview = () => {
       >
         제작페이지로 돌아가기
       </button>
+
       {/* 상단 고정된 헤더 */}
       <div style={{ position: "fixed", top: 0, left: 0, width: "100%", zIndex: 9999 }}>
         <TpHeaderUser
@@ -91,7 +95,7 @@ const TpPagePreview = () => {
         />
       </div>
 
-      {/* 본문 컴포넌트 */}
+      {/* 본문 영역 */}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentPageIndex}
@@ -100,18 +104,33 @@ const TpPagePreview = () => {
           animate="animate"
           exit="exit"
         >
-          {currentComponents.map((comp, index) => {
-            const Comp = componentMap[comp.type];
-            if (!Comp) return null;
-            return (
-              <Comp
-                key={comp.id ?? index}
-                {...comp}
-                isPreview={true}
-                pages={pages}
-              />
-            );
-          })}
+          {isValidPage ? (
+            currentComponents.map((comp, index) => {
+              const Comp = componentMap[comp.type];
+              if (!Comp) return null;
+              return (
+                <Comp
+                  key={comp.id ?? index}
+                  {...comp}
+                  isPreview={true}
+                  pages={pages}
+                />
+              );
+            })
+          ) : (
+            <div
+              style={{
+                padding: "200px 0",
+                color: "#ccc",
+                textAlign: "center",
+                fontSize: "20px",
+              }}
+            >
+              ⚠ 존재하지 않는 페이지입니다.
+              <br />
+              상단 메뉴에서 다른 항목을 선택해주세요.
+            </div>
+          )}
         </motion.div>
       </AnimatePresence>
     </div>
@@ -119,4 +138,3 @@ const TpPagePreview = () => {
 };
 
 export default TpPagePreview;
-

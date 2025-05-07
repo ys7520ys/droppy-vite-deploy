@@ -239,25 +239,31 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Tpsection02 = ({ text = "건강한 한끼를 위해서\n제대로된 식사를 제공합니다.", boxes = [], align = 'center', onBoxEdit }) => {
+const Tpsection02 = ({
+  text = "건강한 한끼를 위해서\n제대로된 식사를 제공합니다.",
+  boxes = [],
+  align = "center",
+  onBoxEdit,
+}) => {
   const defaultBoxes = [
     {
       num: "01",
       title: "식사에 진심인\n사람들을 위해",
       description1: "빠르게 끝내는 식사가 아닌, 영양과 균형을 생각한 식사입니다.",
-      description2: "진짜 식사는 준비부터 다릅니다."
+      description2: "진짜 식사는 준비부터 다릅니다.",
     },
     {
       num: "02",
       title: "매일 반복되는 식사,\n지루하지 않게",
       description1: "다양한 식단으로 식사의 즐거움을 더합니다.",
-      description2: "매일 다른 메뉴, 매일 새로운 활력."
+      description2: "매일 다른 메뉴, 매일 새로운 활력.",
     },
     {
       num: "03",
       title: "편리함과 건강,\n두 마리 토끼를 동시에",
-      description1: "간편함을 원해도 건강은 포기금지. 준비는 우리가 선택은 당신의 몫입니다.",
-      description2: "집에서도, 사무실에서도 완벽한 한 끼."
+      description1:
+        "간편함을 원해도 건강은 포기금지. 준비는 우리가 선택은 당신의 몫입니다.",
+      description2: "집에서도, 사무실에서도 완벽한 한 끼.",
     },
   ];
 
@@ -287,8 +293,8 @@ const Tpsection02 = ({ text = "건강한 한끼를 위해서\n제대로된 식�
           scrollTrigger: {
             trigger: titleSelector,
             start: isMobile ? "top 90%" : "top 85%",
-            toggleActions: "play none none reverse"
-          }
+            toggleActions: "play none none reverse",
+          },
         });
 
         gsap.utils.toArray(boxSelector).forEach((box, i) => {
@@ -300,9 +306,9 @@ const Tpsection02 = ({ text = "건강한 한끼를 위해서\n제대로된 식�
             scrollTrigger: {
               trigger: box,
               start: isMobile ? "top 93%" : "top 75%",
-              toggleActions: "play none none reverse"
+              toggleActions: "play none none reverse",
             },
-            delay: i * 0.1
+            delay: i * 0.1,
           });
         });
       }, sectionRef);
@@ -327,6 +333,22 @@ const Tpsection02 = ({ text = "건강한 한끼를 위해서\n제대로된 식�
     }
   }, [mainText, content, textAlign, editingIndex, editingTitle]);
 
+  useEffect(() => {
+    const updateResponsiveClass = () => {
+      const width = sectionRef.current?.clientWidth;
+      if (!width) return;
+
+      sectionRef.current.classList.remove("is-mobile");
+      if (width <= 768) {
+        sectionRef.current.classList.add("is-mobile");
+      }
+    };
+
+    updateResponsiveClass();
+    window.addEventListener("resize", updateResponsiveClass);
+    return () => window.removeEventListener("resize", updateResponsiveClass);
+  }, []);
+
   const handleUpdateBox = (index, updatedData) => {
     const newBoxes = content.map((b, i) => (i === index ? updatedData : b));
     setContent(newBoxes);
@@ -341,11 +363,14 @@ const Tpsection02 = ({ text = "건강한 한끼를 위해서\n제대로된 식�
     <section className="tpSection02" ref={sectionRef} id="part1">
       <h2
         className="tpSection02__title"
-        style={{ textAlign, cursor: 'pointer' }}
+        style={{ textAlign, cursor: "pointer" }}
         onClick={() => setEditingTitle(true)}
       >
-        {mainText.split('\n').map((line, i) => (
-          <span key={i}>{line}<br /></span>
+        {mainText.split("\n").map((line, i) => (
+          <span key={i}>
+            {line}
+            <br />
+          </span>
         ))}
       </h2>
 
@@ -355,7 +380,10 @@ const Tpsection02 = ({ text = "건강한 한끼를 위해서\n제대로된 식�
             <div className="numText">{box.num}</div>
             <div className="titleText">
               {box.title.split("\n").map((line, idx) => (
-                <span key={idx}>{line}<br /></span>
+                <span key={idx}>
+                  {line}
+                  <br />
+                </span>
               ))}
             </div>
             <hr />
@@ -401,25 +429,37 @@ const EditTitleModal = ({ text, align, onChange, onClose }) => {
   }, []);
 
   return (
-    <div style={{ position: 'fixed', top: 100, left: 100, background: '#fff', padding: 20, border: '1px solid #ccc', zIndex: 9999 }}>
-      <button onClick={onClose} style={{ float: 'right' }}>❌</button>
+    <div
+      style={{
+        position: "fixed",
+        top: 100,
+        left: 100,
+        background: "#fff",
+        padding: 20,
+        border: "1px solid #ccc",
+        zIndex: 9999,
+      }}
+    >
+      <button onClick={onClose} style={{ float: "right" }}>
+        ❌
+      </button>
       <h3>상단 타이틀 수정</h3>
       <textarea
         value={newText}
         onChange={(e) => setNewText(e.target.value)}
         rows={4}
-        style={{ width: '100%', marginBottom: 10 }}
+        style={{ width: "100%", marginBottom: 10 }}
       />
-      <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
-        {['left', 'center', 'right'].map((opt) => (
+      <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+        {["left", "center", "right"].map((opt) => (
           <button
             key={opt}
             onClick={() => setNewAlign(opt)}
             style={{
-              padding: '6px 12px',
-              border: '1px solid #ccc',
-              background: newAlign === opt ? '#007bff' : '#eee',
-              color: newAlign === opt ? '#fff' : '#000'
+              padding: "6px 12px",
+              border: "1px solid #ccc",
+              background: newAlign === opt ? "#007bff" : "#eee",
+              color: newAlign === opt ? "#fff" : "#000",
             }}
           >
             {opt}
@@ -439,22 +479,57 @@ const EditBoxModal = ({ data, onChange, onClose }) => {
   }, [localData]);
 
   const handleChange = (key, value) => {
-    setLocalData(prev => ({ ...prev, [key]: value }));
+    setLocalData((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
-    <div style={{ position: 'fixed', top: 100, left: 100, background: '#fff', padding: 20, border: '1px solid #ccc', zIndex: 9999 }}>
-      <button onClick={onClose} style={{ float: 'right' }}>✅ 저장 & 닫기</button>
+    <div
+      style={{
+        position: "fixed",
+        top: 100,
+        left: 100,
+        background: "#fff",
+        padding: 20,
+        border: "1px solid #ccc",
+        zIndex: 9999,
+      }}
+    >
+      <button onClick={onClose} style={{ float: "right" }}>
+        ✅ 저장 & 닫기
+      </button>
       <h3>내용 수정</h3>
-      <input value={localData.num} onChange={(e) => handleChange("num", e.target.value)} placeholder="번호" style={{ width: '100%', marginBottom: 10 }} />
-      <textarea value={localData.title} onChange={(e) => handleChange("title", e.target.value)} placeholder="제목" style={{ width: '100%', marginBottom: 10 }} rows={2} />
-      <textarea value={localData.description1} onChange={(e) => handleChange("description1", e.target.value)} placeholder="설명 첫 줄" style={{ width: '100%', marginBottom: 10 }} rows={2} />
-      <textarea value={localData.description2} onChange={(e) => handleChange("description2", e.target.value)} placeholder="설명 두 번째 줄" style={{ width: '100%' }} rows={2} />
-      <button onClick={onClose} style={{ marginTop: 10 }}>저장하고 닫기</button>
+      <input
+        value={localData.num}
+        onChange={(e) => handleChange("num", e.target.value)}
+        placeholder="번호"
+        style={{ width: "100%", marginBottom: 10 }}
+      />
+      <textarea
+        value={localData.title}
+        onChange={(e) => handleChange("title", e.target.value)}
+        placeholder="제목"
+        style={{ width: "100%", marginBottom: 10 }}
+        rows={2}
+      />
+      <textarea
+        value={localData.description1}
+        onChange={(e) => handleChange("description1", e.target.value)}
+        placeholder="설명 첫 줄"
+        style={{ width: "100%", marginBottom: 10 }}
+        rows={2}
+      />
+      <textarea
+        value={localData.description2}
+        onChange={(e) => handleChange("description2", e.target.value)}
+        placeholder="설명 두 번째 줄"
+        style={{ width: "100%" }}
+        rows={2}
+      />
+      <button onClick={onClose} style={{ marginTop: 10 }}>
+        저장하고 닫기
+      </button>
     </div>
   );
 };
 
 export default Tpsection02;
-
-
