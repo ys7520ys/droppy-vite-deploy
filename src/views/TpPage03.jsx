@@ -398,6 +398,8 @@ function TpPage03() {
   const [name, setName] = useState("");
   const [activeTab, setActiveTab] = useState("상단메뉴");
   const [removingIndex, setRemovingIndex] = useState(null); // ✅ 이거 추가해줘!
+const [customDomain, setCustomDomain] = useState(""); // ✅ 이 줄 추가!
+
   const navigate = useNavigate(); // TpPage03 안에서 선언
   // 🔥 Firestore에서 저장된 컴포넌트 가져오기
   const [savedSites, setSavedSites] = useState([]); // 🔥 저장된 사이트 리스트
@@ -886,6 +888,42 @@ const handleDelete = (index) => {
         alert("저장 실패: " + err.message);
       }
     };
+const handleDomainSubmit = async () => {
+  if (!customDomain || !email || !name) {
+    alert("이름, 이메일, 도메인을 모두 입력해주세요.");
+    return;
+  }
+
+  try {
+    // ✅ 입력한 customDomain 값을 기반으로 전체 도메인 구성 (예: first → first.droppy.kr)
+    const subdomain = customDomain.toLowerCase().replace(/\s+/g, "-"); // 공백 제거 및 소문자 처리
+    const fullDomain = `${subdomain}.droppy.kr`;
+
+    // ✅ Firestore에 저장
+    const docRef = await addDoc(collection(db, "orders"), {
+      user: { name, email },
+      domain: fullDomain,
+      pages,
+      headerType,
+      createdAt: serverTimestamp(),
+    });
+
+    setOrderId(docRef.id);
+
+    // ✅ Netlify 배포 API 호출
+    await fetch("/api/deploy", {
+      method: "POST",
+      body: JSON.stringify({ domain: fullDomain, orderId: docRef.id }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    alert(`주문 완료! 사이트 주소: https://${fullDomain}`);
+  } catch (err) {
+    console.error("🔥 도메인 주문 실패:", err);
+    alert("저장 또는 배포에 실패했습니다.");
+  }
+};
+
 
   const handleBuild = () => {
     const htmlBody = pages.map((page, pageIndex) => {
@@ -1451,6 +1489,38 @@ const handlePreview = () => {
     >
       <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" style={{marginBottom:"10px", width: "100%", height: "50px", padding: "10px", borderRadius: "10px", border: "none", outline: "none" }} />
       <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" style={{marginBottom:"10px", width: "100%", height: "50px", padding: "10px", borderRadius: "10px", border: "none", outline: "none" }} />
+      <input
+        value={customDomain}
+        onChange={(e) => setCustomDomain(e.target.value)}
+        placeholder="원하는 도메인 (예: myshop)"
+        style={{
+          marginBottom: "10px",
+          width: "100%",
+          height: "50px",
+          padding: "10px",
+          borderRadius: "10px",
+          border: "none",
+          outline: "none",
+          fontSize: "16px",
+        }}
+      />
+        <button
+        onClick={handleDomainSubmit}
+        style={{
+          marginBottom: "10px",
+          width: "100%",
+          padding: "12px 20px",
+          background: "#222",
+          color: "#fff",
+          border: "none",
+          borderRadius: "10px",
+          fontSize: "16px",
+          fontWeight: "bold",
+          cursor: "pointer",
+        }}
+      >
+        도메인으로 주문하기
+      </button>
       <button onClick={handleSubmitOrder} style={{ borderRadius: "10px", padding: "10px" }}>Firestore 저장</button>
       <button onClick={fetchSavedSites} style={{ borderRadius: "10px", padding: "10px" }}>사이트 불러오기</button>
 
