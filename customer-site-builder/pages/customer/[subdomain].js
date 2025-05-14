@@ -66,12 +66,180 @@
 
 
 
+// // ✅ pages/[subdomain].js
+// import dynamic from "next/dynamic";
+// import { db } from "@/lib/firebase";
+// import { collection, query, where, getDocs } from "firebase/firestore";
+
+// // ✅ 고객 콘텐츠 컴포넌트 (클라이언트 전용 렌더링)
+// const CustomerContent = dynamic(() => import("@/components/CustomerContent"), {
+//   ssr: false,
+//   loading: () => (
+//     <div style={{ padding: "100px", textAlign: "center", color: "#fff" }}>
+//       페이지 불러오는 중...
+//     </div>
+//   ),
+// });
+
+// // ✅ Firestore에 저장된 모든 도메인 기반으로 정적 경로 생성
+// export async function getStaticPaths() {
+//   try {
+//     const snapshot = await getDocs(collection(db, "orders"));
+//     const paths = snapshot.docs.map((doc) => {
+//       const domain = doc.data().domain; // ex: myshop.droppy.kr
+//       const subdomain = domain.split(".")[0]; // 'myshop'
+//       return { params: { subdomain } };
+//     });
+
+//     return {
+//       paths,
+//       fallback: false, // ✅ 완전 정적 사이트로 만들기 위해 false
+//     };
+//   } catch (err) {
+//     console.error("🔥 getStaticPaths 실패:", err);
+//     return {
+//       paths: [],
+//       fallback: false,
+//     };
+//   }
+// }
+
+// // ✅ 정적 페이지 생성 시 각 도메인 데이터 불러오기
+// export async function getStaticProps({ params }) {
+//   const subdomain = params?.subdomain?.toLowerCase?.();
+
+//   if (!subdomain) {
+//     console.warn("❗ 서브도메인 없음");
+//     return { notFound: true };
+//   }
+
+//   const fullDomain = `${subdomain}.droppy.kr`;
+
+//   try {
+//     const q = query(
+//       collection(db, "orders"),
+//       where("domain", "==", fullDomain)
+//     );
+//     const snap = await getDocs(q);
+
+//     if (snap.empty) {
+//       console.warn(`❌ '${fullDomain}' 문서 없음`);
+//       return { notFound: true };
+//     }
+
+//     const pageData = snap.docs[0].data();
+
+//     return {
+//       props: { pageData },
+//     };
+//   } catch (err) {
+//     console.error("🔥 getStaticProps 실패:", err);
+//     return { notFound: true };
+//   }
+// }
+
+// // ✅ 최종 페이지
+// export default function CustomerPage({ pageData }) {
+//   return <CustomerContent pageData={pageData} />;
+// }
+
+
+
+
+
+
+
+// // ✅ pages/[subdomain].js
+// import dynamic from "next/dynamic";
+// import { db } from "@/lib/firebase";
+// import { collection, query, where, getDocs } from "firebase/firestore";
+
+// // ✅ 고객 콘텐츠 컴포넌트 (클라이언트 전용 렌더링)
+// const CustomerContent = dynamic(() => import("@/components/CustomerContent"), {
+//   ssr: false,
+//   loading: () => (
+//     <div style={{ padding: "100px", textAlign: "center", color: "#fff" }}>
+//       페이지 불러오는 중...
+//     </div>
+//   ),
+// });
+
+// // ✅ 정적 경로 목록 생성
+// export async function getStaticPaths() {
+//   try {
+//     const snapshot = await getDocs(collection(db, "orders"));
+//     const paths = snapshot.docs.map((doc) => {
+//       const domain = doc.data().domain;
+//       const subdomain = domain.split(".")[0];
+//       return { params: { subdomain } };
+//     });
+
+//     return {
+//       paths,
+//       fallback: false,
+//     };
+//   } catch (err) {
+//     console.error("🔥 getStaticPaths 실패:", err);
+//     return {
+//       paths: [],
+//       fallback: false,
+//     };
+//   }
+// }
+
+// // ✅ 각 도메인에 대응하는 정적 데이터 불러오기
+// export async function getStaticProps({ params }) {
+//   const subdomain = params?.subdomain?.toLowerCase?.();
+
+//   if (!subdomain) {
+//     console.warn("❗ 서브도메인 없음");
+//     return { notFound: true };
+//   }
+
+//   const fullDomain = `${subdomain}.droppy.kr`;
+
+//   try {
+//     const q = query(
+//       collection(db, "orders"),
+//       where("domain", "==", fullDomain)
+//     );
+//     const snap = await getDocs(q);
+
+//     if (snap.empty) {
+//       console.warn(`❌ '${fullDomain}' 문서 없음`);
+//       return { notFound: true };
+//     }
+
+//     const raw = snap.docs[0].data();
+
+//     // ✅ 직렬화 가능한 값으로 변환
+//     const pageData = {
+//       ...raw,
+//       createdAt: raw.createdAt?.toMillis?.() || null,
+//     };
+
+//     return {
+//       props: { pageData },
+//     };
+//   } catch (err) {
+//     console.error("🔥 getStaticProps 실패:", err);
+//     return { notFound: true };
+//   }
+// }
+
+// // ✅ 최종 페이지 컴포넌트
+// export default function CustomerPage({ pageData }) {
+//   return <CustomerContent pageData={pageData} />;
+// }
+
+
+
+
 // ✅ pages/[subdomain].js
 import dynamic from "next/dynamic";
 import { db } from "@/lib/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 
-// ✅ 고객 콘텐츠 컴포넌트 (클라이언트 전용 렌더링)
 const CustomerContent = dynamic(() => import("@/components/CustomerContent"), {
   ssr: false,
   loading: () => (
@@ -81,19 +249,23 @@ const CustomerContent = dynamic(() => import("@/components/CustomerContent"), {
   ),
 });
 
-// ✅ Firestore에 저장된 모든 도메인 기반으로 정적 경로 생성
+// ✅ 정적 경로 목록 생성
 export async function getStaticPaths() {
   try {
     const snapshot = await getDocs(collection(db, "orders"));
     const paths = snapshot.docs.map((doc) => {
-      const domain = doc.data().domain; // ex: myshop.droppy.kr
-      const subdomain = domain.split(".")[0]; // 'myshop'
+      const domain = doc.data().domain;
+      if (!domain || !domain.includes(".droppy.kr")) return null;
+
+      const subdomain = domain.split(".")[0];
       return { params: { subdomain } };
-    });
+    }).filter(Boolean); // ❗ null 제거
+
+    console.log("📦 getStaticPaths 결과:", paths);
 
     return {
       paths,
-      fallback: false, // ✅ 완전 정적 사이트로 만들기 위해 false
+      fallback: false, // ✅ export용 필수
     };
   } catch (err) {
     console.error("🔥 getStaticPaths 실패:", err);
@@ -104,7 +276,7 @@ export async function getStaticPaths() {
   }
 }
 
-// ✅ 정적 페이지 생성 시 각 도메인 데이터 불러오기
+// ✅ 정적 페이지 데이터
 export async function getStaticProps({ params }) {
   const subdomain = params?.subdomain?.toLowerCase?.();
 
@@ -127,7 +299,12 @@ export async function getStaticProps({ params }) {
       return { notFound: true };
     }
 
-    const pageData = snap.docs[0].data();
+    const raw = snap.docs[0].data();
+
+    const pageData = {
+      ...raw,
+      createdAt: raw.createdAt?.toMillis?.() || null,
+    };
 
     return {
       props: { pageData },
@@ -138,7 +315,7 @@ export async function getStaticProps({ params }) {
   }
 }
 
-// ✅ 최종 페이지
+// ✅ 렌더링
 export default function CustomerPage({ pageData }) {
   return <CustomerContent pageData={pageData} />;
 }

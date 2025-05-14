@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build && npx next export"
+  command = "npm install --legacy-peer-deps && npm run build"
   publish = "out"
 
 [[plugins]]

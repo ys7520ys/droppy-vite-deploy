@@ -118,49 +118,70 @@
 
 
 
+// // ✅ pages/index.js
+// import dynamic from "next/dynamic";
+// import { db } from "@/lib/firebase";
+// import { collection, query, where, getDocs } from "firebase/firestore";
+
+// // ✅ 동적 컴포넌트 로딩 (클라이언트 전용)
+// const CustomerContent = dynamic(() => import("@/components/CustomerContent"), {
+//   ssr: false,
+//   loading: () => (
+//     <div style={{ color: "#fff", padding: "100px", textAlign: "center" }}>
+//       페이지 불러오는 중...
+//     </div>
+//   ),
+// });
+
+// export async function getServerSideProps({ req }) {
+//   const host = req.headers.host || ""; // 예: 'myshop.droppy.kr'
+//   const subdomain = host.split(".")[0]; // 'myshop'
+//   const fullDomain = `${subdomain}.droppy.kr`;
+
+//   try {
+//     const q = query(
+//       collection(db, "orders"),
+//       where("domain", "==", fullDomain)
+//     );
+//     const snap = await getDocs(q);
+
+//     if (snap.empty) {
+//       console.warn(`❌ '${fullDomain}' 에 해당하는 주문 없음`);
+//       return { notFound: true };
+//     }
+
+//     const pageData = snap.docs[0].data();
+
+//     return {
+//       props: { pageData },
+//     };
+//   } catch (error) {
+//     console.error("🔥 Firestore 에러:", error);
+//     return { notFound: true };
+//   }
+// }
+
+// export default function Home({ pageData }) {
+//   return <CustomerContent pageData={pageData} />;
+// }
+
+
+
+
+
+
+
 // ✅ pages/index.js
-import dynamic from "next/dynamic";
-import { db } from "@/lib/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
-
-// ✅ 동적 컴포넌트 로딩 (클라이언트 전용)
-const CustomerContent = dynamic(() => import("@/components/CustomerContent"), {
-  ssr: false,
-  loading: () => (
-    <div style={{ color: "#fff", padding: "100px", textAlign: "center" }}>
-      페이지 불러오는 중...
-    </div>
-  ),
-});
-
-export async function getServerSideProps({ req }) {
-  const host = req.headers.host || ""; // 예: 'myshop.droppy.kr'
-  const subdomain = host.split(".")[0]; // 'myshop'
-  const fullDomain = `${subdomain}.droppy.kr`;
-
-  try {
-    const q = query(
-      collection(db, "orders"),
-      where("domain", "==", fullDomain)
-    );
-    const snap = await getDocs(q);
-
-    if (snap.empty) {
-      console.warn(`❌ '${fullDomain}' 에 해당하는 주문 없음`);
-      return { notFound: true };
-    }
-
-    const pageData = snap.docs[0].data();
-
-    return {
-      props: { pageData },
-    };
-  } catch (error) {
-    console.error("🔥 Firestore 에러:", error);
-    return { notFound: true };
-  }
+export default function Home() {
+  return (
+    <main style={{ padding: "100px", textAlign: "center", fontSize: "18px" }}>
+      <h1>📦 Welcome to Droppy!</h1>
+      <p>
+        이곳은 고객 전용 사이트를 자동 생성하는 플랫폼입니다.<br />
+        도메인 주소로 접속 시 각 고객 사이트가 정적으로 열립니다.<br />
+        예: <code>https://shopy.droppy.kr</code>
+      </p>
+    </main>
+  );
 }
 
-export default function Home({ pageData }) {
-  return <CustomerContent pageData={pageData} />;
-}
