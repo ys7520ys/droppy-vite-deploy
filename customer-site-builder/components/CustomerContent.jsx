@@ -70,6 +70,55 @@
 
 
 
+// "use client";
+
+// import { useState, useEffect } from "react";
+// import TpHeader02 from "@/components/TpHeader/TpHeader02";
+// import TpBanner04 from "@/components/TpBanner/TpBanner04";
+// import { AnimatePresence } from "framer-motion";
+// import AnimatedPage from "@/components/AnimatedPage";
+
+// // ✅ 현재 존재하는 컴포넌트만 등록
+// const componentMap = {
+//   배너04: TpBanner04,
+// };
+
+// export default function CustomerContent({ pageData }) {
+//   const [currentPageIndex, setCurrentPageIndex] = useState(0);
+
+//   useEffect(() => {
+//     window.scrollTo({ top: 0, behavior: "smooth" });
+//   }, [currentPageIndex]);
+
+//   return (
+//     <main style={{ background: "#000", color: "#fff", margin: 0, padding: 0 }}>
+//       <TpHeader02
+//         menuItems={pageData.pages?.[currentPageIndex]?.menuItems || []}
+//         isPreview
+//         setCurrentPageIndex={setCurrentPageIndex}
+//         currentPageIndex={currentPageIndex}
+//       />
+
+//       <AnimatePresence mode="wait">
+//         <AnimatedPage key={currentPageIndex} index={currentPageIndex}>
+//           {pageData.pages?.[currentPageIndex]?.components?.map((comp, i) => {
+//             const Comp = componentMap[comp.type];
+//             return Comp ? (
+//               <Comp key={i} {...comp} isPreview />
+//             ) : null; // 지원되지 않는 컴포넌트는 렌더링하지 않음
+//           })}
+//         </AnimatedPage>
+//       </AnimatePresence>
+//     </main>
+//   );
+// }
+
+
+
+
+
+
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -78,8 +127,9 @@ import TpBanner04 from "@/components/TpBanner/TpBanner04";
 import { AnimatePresence } from "framer-motion";
 import AnimatedPage from "@/components/AnimatedPage";
 
-// ✅ 현재 존재하는 컴포넌트만 등록
+// ✅ "헤더02"도 등록
 const componentMap = {
+  헤더02: TpHeader02,
   배너04: TpBanner04,
 };
 
@@ -92,23 +142,24 @@ export default function CustomerContent({ pageData }) {
 
   return (
     <main style={{ background: "#000", color: "#fff", margin: 0, padding: 0 }}>
-      <TpHeader02
-        menuItems={pageData.pages?.[currentPageIndex]?.menuItems || []}
-        isPreview
-        setCurrentPageIndex={setCurrentPageIndex}
-        currentPageIndex={currentPageIndex}
-      />
-
+      {/* 🔥 헤더02도 컴포넌트에서 처리할 수 있도록 변경 */}
       <AnimatePresence mode="wait">
         <AnimatedPage key={currentPageIndex} index={currentPageIndex}>
           {pageData.pages?.[currentPageIndex]?.components?.map((comp, i) => {
             const Comp = componentMap[comp.type];
             return Comp ? (
-              <Comp key={i} {...comp} isPreview />
-            ) : null; // 지원되지 않는 컴포넌트는 렌더링하지 않음
+              <Comp
+                key={i}
+                {...comp}
+                isPreview
+                setCurrentPageIndex={setCurrentPageIndex}
+                currentPageIndex={currentPageIndex}
+              />
+            ) : null;
           })}
         </AnimatedPage>
       </AnimatePresence>
     </main>
   );
 }
+
