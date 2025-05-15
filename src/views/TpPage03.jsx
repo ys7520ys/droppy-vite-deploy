@@ -911,7 +911,7 @@ const handleDomainSubmit = async () => {
     setOrderId(docRef.id);
 
     // ✅ Netlify 배포 API 호출
-    await fetch("/api/deploy", {
+    await fetch("https://us-central1-salepage-f39a1.cloudfunctions.net/autoDeploy", {
       method: "POST",
       body: JSON.stringify({ domain: fullDomain, orderId: docRef.id }),
       headers: { "Content-Type": "application/json" },

@@ -92,63 +92,47 @@
 // }
 
 
+
+// // /pages/api/deploy.js
+
 // export default async function handler(req, res) {
 //   if (req.method !== "POST") return res.status(405).end();
 
 //   const { domain, orderId } = JSON.parse(req.body);
+
+//   console.log("🔥 요청받은 domain:", domain);
+//   console.log("🔥 요청받은 orderId:", orderId);
+
+//   const SITE_ID = "d7d9b502-89e7-4c89-b87f-2543c5d94121";
 //   const NETLIFY_TOKEN = process.env.NETLIFY_AUTH_TOKEN;
-//   const subdomain = domain.split(".")[0];
+//   const NETLIFY_API = `https://api.netlify.com/api/v1/sites/${SITE_ID}/domains`;
 
 //   try {
-//     // ① 고객용 사이트 새로 생성
-//     const siteRes = await fetch("https://api.netlify.com/api/v1/sites", {
+//     const response = await fetch(NETLIFY_API, {
 //       method: "POST",
 //       headers: {
 //         Authorization: `Bearer ${NETLIFY_TOKEN}`,
 //         "Content-Type": "application/json",
 //       },
-//       body: JSON.stringify({
-//         name: `site-${subdomain}-${Date.now()}`, // site name 중복 방지
-//       }),
+//       body: JSON.stringify({ name: domain }),
 //     });
 
-//     const siteData = await siteRes.json();
+//     const result = await response.text(); // <- ✅ 에러 추적 위해 json 대신 text
+//     console.log("📦 Netlify 응답 내용:", result);
 
-//     if (!siteRes.ok) {
-//       console.error("❌ 사이트 생성 실패:", siteData);
-//       return res.status(500).json({ success: false, message: "사이트 생성 실패", raw: siteData });
+//     if (!response.ok) {
+//       return res.status(500).json({
+//         success: false,
+//         message: "Netlify 도메인 연결 실패",
+//         raw: result,
+//       });
 //     }
 
-//     const newSiteId = siteData.id;
-
-//     // ② 도메인 연결
-//     const domainRes = await fetch(
-//       `https://api.netlify.com/api/v1/sites/${newSiteId}/domains`,
-//       {
-//         method: "POST",
-//         headers: {
-//           Authorization: `Bearer ${NETLIFY_TOKEN}`,
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({ name: domain }), // aaa.droppy.kr
-//       }
-//     );
-
-//     const domainData = await domainRes.json();
-
-//     if (!domainRes.ok) {
-//       console.error("❌ 도메인 연결 실패:", domainData);
-//       return res.status(500).json({ success: false, message: "도메인 연결 실패", raw: domainData });
-//     }
-
-//     // ③ 이제 해당 폴더를 배포하거나, webhook 호출 or deploy endpoint 사용
-//     // 이건 옵션에 따라 다르게 구성 가능
-
-//     return res.status(200).json({
-//       success: true,
-//       message: "새 사이트 생성 및 도메인 연결 완료!",
-//       siteUrl: siteData.ssl_url || siteData.url,
+//     await fetch("https://api.netlify.com/build_hooks/68220dba4690e1009bf78a24", {
+//       method: "POST",
 //     });
+
+//     return res.status(200).json({ success: true, message: "도메인 연결 및 배포 성공!" });
 //   } catch (err) {
 //     console.error("🔥 오류 발생:", err);
 //     return res.status(500).json({ success: false, message: "서버 내부 오류" });
@@ -156,243 +140,55 @@
 // }
 
 
-// import fs from "fs";
-// import path from "path";
-// import fetch from "node-fetch";
-// import archiver from "archiver";
-
-// export default async function handler(req, res) {
-//   if (req.method !== "POST") return res.status(405).end();
-
-//   const { domain } = JSON.parse(req.body);
-//   const NETLIFY_TOKEN = process.env.NETLIFY_AUTH_TOKEN;
-//   const subdomain = domain.split(".")[0];
-
-//   try {
-//     // ① Netlify 사이트 생성
-//     const siteRes = await fetch("https://api.netlify.com/api/v1/sites", {
-//       method: "POST",
-//       headers: {
-//         Authorization: `Bearer ${NETLIFY_TOKEN}`,
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({ name: `site-${subdomain}-${Date.now()}` }),
-//     });
-
-//     const site = await siteRes.json();
-//     const siteId = site.id;
-
-//     // ② 도메인 연결
-//     await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/domains`, {
-//       method: "POST",
-//       headers: {
-//         Authorization: `Bearer ${NETLIFY_TOKEN}`,
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({ name: domain }),
-//     });
-
-//     // ③ 고객용 HTML 복사 → index.html
-//     const srcHtml = path.resolve(`out/customer/${subdomain}.html`);
-//     const deployDir = path.resolve(`.deploy-temp/${subdomain}`);
-//     fs.mkdirSync(deployDir, { recursive: true });
-//     fs.copyFileSync(srcHtml, path.join(deployDir, "index.html"));
-
-//     // ④ 디렉토리 압축 (ZIP)
-//     const zipPath = path.resolve(`.deploy-temp/${subdomain}.zip`);
-//     await new Promise((resolve, reject) => {
-//       const output = fs.createWriteStream(zipPath);
-//       const archive = archiver("zip");
-
-//       output.on("close", resolve);
-//       archive.on("error", reject);
-
-//       archive.pipe(output);
-//       archive.directory(deployDir, false);
-//       archive.finalize();
-//     });
-
-//     const zipBuffer = fs.readFileSync(zipPath);
-
-//     // ⑤ Netlify ZIP 업로드
-//     const deployRes = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/deploys`, {
-//       method: "POST",
-//       headers: {
-//         Authorization: `Bearer ${NETLIFY_TOKEN}`,
-//         "Content-Type": "application/zip",
-//       },
-//       body: zipBuffer,
-//     });
-
-//     const deploy = await deployRes.json();
-
-//     return res.status(200).json({
-//       success: true,
-//       siteUrl: site.ssl_url || site.url,
-//       domain,
-//     });
-//   } catch (err) {
-//     console.error("🔥 오류 발생:", err);
-//     return res.status(500).json({ success: false, message: "배포 실패" });
-//   }
-// }
 
 
 
 
 
 
-// // ✅ 수정된 deploy.js (pages/api/deploy.js)
-// import fs from "fs";
-// import path from "path";
-// import fetch from "node-fetch";
-// import archiver from "archiver";
-
-// export default async function handler(req, res) {
-//   if (req.method !== "POST") return res.status(405).end();
-
-//   const { domain } = JSON.parse(req.body);
-//   const NETLIFY_TOKEN = process.env.NETLIFY_AUTH_TOKEN;
-//   const subdomain = domain.split(".")[0];
-
-//   try {
-//     // ① Netlify 사이트 생성
-//     const siteRes = await fetch("https://api.netlify.com/api/v1/sites", {
-//       method: "POST",
-//       headers: {
-//         Authorization: `Bearer ${NETLIFY_TOKEN}`,
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({ name: `site-${subdomain}-${Date.now()}` }),
-//     });
-
-//     const site = await siteRes.json();
-//     const siteId = site.id;
-
-//     if (!siteId) {
-//       throw new Error("Netlify 사이트 생성 실패. site.id 없음");
-//     }
-
-//     // ② 도메인 연결
-//     const domainRes = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/domains`, {
-//       method: "POST",
-//       headers: {
-//         Authorization: `Bearer ${NETLIFY_TOKEN}`,
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({ name: domain }),
-//     });
-
-//     if (!domainRes.ok) {
-//       const errorDetail = await domainRes.text();
-//       throw new Error(`도메인 연결 실패: ${errorDetail}`);
-//     }
-
-//     // ③ HTML 복사
-//     const srcHtml = path.resolve(`out/customer/${subdomain}.html`);
-//     const deployDir = path.resolve(`.deploy-temp/${subdomain}`);
-//     const deployIndex = path.join(deployDir, "index.html");
-
-//     fs.mkdirSync(deployDir, { recursive: true });
-//     fs.copyFileSync(srcHtml, deployIndex);
-
-//     // ④ ZIP 압축
-//     const zipPath = path.resolve(`.deploy-temp/${subdomain}.zip`);
-//     await new Promise((resolve, reject) => {
-//       const output = fs.createWriteStream(zipPath);
-//       const archive = archiver("zip", { zlib: { level: 9 } });
-
-//       output.on("close", resolve);
-//       archive.on("error", reject);
-
-//       archive.pipe(output);
-//       archive.directory(deployDir, false);
-//       archive.finalize();
-//     });
-
-//     // ⑤ Netlify ZIP 업로드
-//     const zipBuffer = fs.readFileSync(zipPath);
-//     const deployRes = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/deploys`, {
-//       method: "POST",
-//       headers: {
-//         Authorization: `Bearer ${NETLIFY_TOKEN}`,
-//         "Content-Type": "application/zip",
-//       },
-//       body: zipBuffer,
-//     });
-
-//     const deploy = await deployRes.json();
-
-//     if (!deploy.ssl_url) {
-//       throw new Error("Netlify 배포 실패: ssl_url 없음");
-//     }
-
-//     return res.status(200).json({
-//       success: true,
-//       siteUrl: deploy.ssl_url,
-//       domain,
-//     });
-//   } catch (err) {
-//     console.error("🔥 오류 발생:", err);
-//     return res.status(500).json({ success: false, message: err.message || "배포 실패" });
-//   }
-// }
-
-
-
-
-// ✅ /pages/api/deploy.js (SaaS 방식: 고객마다 새로운 Netlify 사이트 생성)
-
+// /pages/api/deploy.js
+// 에러 500의 값을 해결한 코드 (autoDeploy)
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
+  console.log("🚨 현재 토큰:", process.env.NETLIFY_AUTH_TOKEN);
+  const { domain, orderId } = req.body; // ✅ 수정됨
 
-  const { domain, orderId } = JSON.parse(req.body);
+  console.log("🔥 요청받은 domain:", domain);
+  console.log("🔥 요청받은 orderId:", orderId);
+
+  const SITE_ID = "d7d9b502-89e7-4c89-b87f-2543c5d94121";
   const NETLIFY_TOKEN = process.env.NETLIFY_AUTH_TOKEN;
-
-  console.log("🔥 요청받은 도메인:", domain);
-  console.log("🔥 주문 ID:", orderId);
+  const NETLIFY_API = `https://api.netlify.com/api/v1/sites/${SITE_ID}/domains`;
 
   try {
-    // ✅ 1. Netlify에 새 사이트 생성
-    const createSiteRes = await fetch("https://api.netlify.com/api/v1/sites", {
+    const response = await fetch(NETLIFY_API, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${NETLIFY_TOKEN}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        name: `droppy-${orderId}`, // 고유한 사이트 이름
-        custom_domain: domain,     // 도메인 연결 (예: shopy.droppy.kr)
-      }),
+      body: JSON.stringify({ name: domain }),
     });
 
-    const createSiteData = await createSiteRes.json();
-    console.log("📦 Netlify 사이트 생성 결과:", createSiteData);
+    const result = await response.text(); // <- 그대로 두기 (debug용)
+    console.log("📦 Netlify 응답 내용:", result);
 
-    if (!createSiteRes.ok) {
+    if (!response.ok) {
       return res.status(500).json({
         success: false,
-        message: "Netlify 사이트 생성 실패",
-        error: createSiteData,
+        message: "Netlify 도메인 연결 실패",
+        raw: result,
       });
     }
 
-    const newSiteId = createSiteData.id;
-
-    // ✅ 2. 사이트 빌드 트리거 (빌드 훅 사용하거나 필요 시 API로 직접 배포)
-    // [선택 사항] createSiteData.build_settings.build_hook_id 사용 가능
     await fetch("https://api.netlify.com/build_hooks/68220dba4690e1009bf78a24", {
       method: "POST",
     });
 
-    return res.status(200).json({
-      success: true,
-      message: "고객용 사이트 생성 및 배포 완료",
-      siteId: newSiteId,
-      domain,
-    });
+    return res.status(200).json({ success: true, message: "도메인 연결 및 배포 성공!" });
+    
   } catch (err) {
     console.error("🔥 오류 발생:", err);
-    return res.status(500).json({ success: false, message: "서버 오류", error: err });
+    return res.status(500).json({ success: false, message: "서버 내부 오류" });
   }
 }

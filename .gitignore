@@ -1,26 +1,34 @@
+# ✅ GitHub 공식 설명 참고용
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# ✅ 의존성 관련
 /node_modules
 /.pnp
 .pnp.js
 
-# testing
+# ✅ 테스트 결과
 /coverage
 
-# production
+# ✅ 빌드 결과물
+/.next
+/out
 /build
+/dist
 
-# misc
+# ✅ OS 및 에디터 불필요 파일
 .DS_Store
+
+# ✅ 환경 변수
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
+# ✅ 로그 파일
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Local Netlify folder
+# ✅ Netlify 관련 폴더
 .netlify
