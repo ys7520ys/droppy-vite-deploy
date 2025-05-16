@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { db } from "@/lib/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 
+// ✅ 클라이언트 사이드 컴포넌트 로딩
 const CustomerContent = dynamic(() => import("@/components/CustomerContent"), {
   ssr: false,
   loading: () => (
@@ -12,21 +13,17 @@ const CustomerContent = dynamic(() => import("@/components/CustomerContent"), {
   ),
 });
 
+// ✅ 정적 경로 생성 비활성화 → 요청 시마다 생성
 export async function getStaticPaths() {
   return {
-    paths: [], // 정적 경로 사전 생성 없음
-    fallback: "blocking", // 요청 시 빌드
+    paths: [], // 사전 생성 경로 없음
+    fallback: "blocking", // 요청 시 페이지 생성
   };
 }
 
+// ✅ 빌드 시 또는 요청 시 정적 데이터 가져오기
 export async function getStaticProps({ params }) {
   const subdomain = params?.subdomain?.toLowerCase?.();
-
-  if (!subdomain) {
-    console.warn("❗ 서브도메인 파라미터 없음");
-    return { notFound: true };
-  }
-
   const fullDomain = `${subdomain}.droppy.kr`;
 
   try {
@@ -34,11 +31,9 @@ export async function getStaticProps({ params }) {
       collection(db, "orders"),
       where("domain", "==", fullDomain)
     );
-
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
-      console.warn(`❌ '${fullDomain}'에 해당하는 도큐먼트가 없음`);
       return { notFound: true };
     }
 
@@ -46,7 +41,7 @@ export async function getStaticProps({ params }) {
 
     return {
       props: { pageData },
-      revalidate: 60, // 🔁 ISR: 60초마다 갱신
+      revalidate: 60, // ISR: 60초마다 갱신
     };
   } catch (error) {
     console.error("🔥 Firestore 도메인 조회 실패:", error);
@@ -54,6 +49,7 @@ export async function getStaticProps({ params }) {
   }
 }
 
+// ✅ 실제 페이지 구성
 export default function CustomerPage({ pageData }) {
   return <CustomerContent pageData={pageData} />;
 }
