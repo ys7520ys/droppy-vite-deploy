@@ -862,44 +862,22 @@ const handleDelete = (index) => {
       localStorage.removeItem("savedComponents");
     };
   
-    const handleSubmitOrder = async () => {
-      if (!db) {
-        alert("Firestore가 초기화되지 않았습니다.");
-        return;
-      }
+const handleSubmitOrder = async () => {
+  if (!db) {
+    alert("Firestore가 초기화되지 않았습니다.");
+    return;
+  }
 
-      if (!email || !name) {
-        alert("이름과 이메일을 입력해주세요.");
-        return;
-      }
-
-      try {
-        const docRef = await addDoc(collection(db, "orders"), {
-          user: { name, email },
-          pages,
-          headerType, // 헤더 타입도 함께 저장
-          createdAt: serverTimestamp(),
-        });
-        setOrderId(docRef.id);
-        clearSavedComponents();
-        alert("주문이 저장되었습니다!");
-      } catch (err) {
-        console.error("🔥 Firestore 저장 오류:", err);
-        alert("저장 실패: " + err.message);
-      }
-    };
-const handleDomainSubmit = async () => {
-  if (!customDomain || !email || !name) {
+  if (!email || !name || !customDomain) {
     alert("이름, 이메일, 도메인을 모두 입력해주세요.");
     return;
   }
 
-  try {
-    // ✅ 입력한 customDomain 값을 기반으로 전체 도메인 구성 (예: first → first.droppy.kr)
-    const subdomain = customDomain.toLowerCase().replace(/\s+/g, "-"); // 공백 제거 및 소문자 처리
-    const fullDomain = `${subdomain}.droppy.kr`;
+  const subdomain = customDomain.toLowerCase().replace(/\s+/g, "-");
+  const fullDomain = `${subdomain}.droppy.kr`;
 
-    // ✅ Firestore에 저장
+  try {
+    // ✅ 1. 주문 정보 Firestore에 저장
     const docRef = await addDoc(collection(db, "orders"), {
       user: { name, email },
       domain: fullDomain,
@@ -909,20 +887,65 @@ const handleDomainSubmit = async () => {
     });
 
     setOrderId(docRef.id);
+    clearSavedComponents();
 
-    // ✅ Netlify 배포 API 호출
-    await fetch("https://us-central1-salepage-f39a1.cloudfunctions.net/autoDeploy", {
+    // ✅ 2. Netlify 자동 배포 함수 호출
+    const deployRes = await fetch("https://us-central1-salepage-f39a1.cloudfunctions.net/autoDeploy", {
       method: "POST",
-      body: JSON.stringify({ domain: fullDomain, orderId: docRef.id }),
       headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ domain: fullDomain }),
     });
 
-    alert(`주문 완료! 사이트 주소: https://${fullDomain}`);
+    const deployData = await deployRes.json();
+
+    if (!deployRes.ok) {
+      console.error("🚨 Netlify 배포 실패:", deployData);
+      alert("사이트 생성 중 오류가 발생했습니다:\n" + deployData.message);
+      return;
+    }
+
+    alert(`✅ 주문 및 사이트 생성 완료!\n\n👉 접속: https://${fullDomain}`);
   } catch (err) {
-    console.error("🔥 도메인 주문 실패:", err);
-    alert("저장 또는 배포에 실패했습니다.");
+    console.error("🔥 전체 처리 중 오류:", err);
+    alert("에러 발생: " + err.message);
   }
 };
+
+    const handleDomainSubmit = async () => {
+      if (!customDomain || !email || !name) {
+        alert("이름, 이메일, 도메인을 모두 입력해주세요.");
+        return;
+      }
+
+      try {
+        // ✅ 입력한 customDomain 값을 기반으로 전체 도메인 구성 (예: first → first.droppy.kr)
+        const subdomain = customDomain.toLowerCase().replace(/\s+/g, "-"); // 공백 제거 및 소문자 처리
+        const fullDomain = `${subdomain}.droppy.kr`;
+
+        // ✅ Firestore에 저장
+        const docRef = await addDoc(collection(db, "orders"), {
+          user: { name, email },
+          domain: fullDomain,
+          pages,
+          headerType,
+          createdAt: serverTimestamp(),
+        });
+
+        setOrderId(docRef.id);
+
+        // ✅ Netlify 배포 API 호출
+        await fetch("https://us-central1-salepage-f39a1.cloudfunctions.net/autoDeploy", {
+          method: "POST",
+          body: JSON.stringify({ domain: fullDomain, orderId: docRef.id }),
+          headers: { "Content-Type": "application/json" },
+        });
+
+        alert(`주문 완료! 사이트 주소: https://${fullDomain}`);
+      } catch (err) {
+        console.error("🔥 도메인 주문 실패:", err);
+        alert("저장 또는 배포에 실패했습니다.");
+      }
+    };
 
 
   const handleBuild = () => {

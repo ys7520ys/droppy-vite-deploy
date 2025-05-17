@@ -138,48 +138,26 @@
 //     return res.status(500).json({ success: false, message: "서버 내부 오류" });
 //   }
 // }
-
-
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ success: false, message: "Method Not Allowed" });
+  // ✅ 1. POST 요청만 허용
+  if (req.method !== "POST") {
+    return res.status(405).json({ success: false, message: "Method Not Allowed" });
+  }
 
+  // ✅ 2. 요청으로부터 도메인 가져오기
   const { domain } = req.body;
-  const subdomain = domain.replace(".droppy.kr", "");
+
+  if (!domain || !domain.endsWith(".droppy.kr")) {
+    return res.status(400).json({ success: false, message: "유효하지 않은 도메인입니다." });
+  }
+
+  // ✅ 3. 환경 변수에서 인증 토큰과 고정된 Netlify 템플릿 사이트 ID 사용
   const NETLIFY_TOKEN = process.env.NETLIFY_AUTH_TOKEN;
+  const NETLIFY_SITE_ID = process.env.NETLIFY_SITE_ID || "cacd0237-b484-45c3-97f8-496bf486b92b";
 
   try {
-    // ✅ Netlify에 새 사이트 생성 (droppy-builder GitHub 저장소 사용)
-    const createRes = await fetch("https://api.netlify.com/api/v1/sites", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${NETLIFY_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: `${subdomain}-droppy-kr`,
-        repo: {
-          repo_provider: "github",
-          repo_url: "https://github.com/ys7520ys/salePage", // droppy-builder의 GitHub 저장소
-          branch: "main"
-        },
-        build_settings: {
-          cmd: "npm run build && npm run export",
-          dir: "out"
-        }
-      }),
-    });
-
-    const siteData = await createRes.json();
-    console.log("✅ Netlify 사이트 생성 응답:", siteData);
-
-    if (!createRes.ok) {
-      return res.status(500).json({ success: false, message: "사이트 생성 실패", raw: siteData });
-    }
-
-    const siteId = siteData.id;
-
-    // ✅ 도메인 연결
-    const domainRes = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/domains`, {
+    // ✅ 4. 도메인 등록 요청
+    const domainRes = await fetch(`https://api.netlify.com/api/v1/sites/${NETLIFY_SITE_ID}/domains`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${NETLIFY_TOKEN}`,
@@ -189,20 +167,31 @@ export default async function handler(req, res) {
     });
 
     const domainData = await domainRes.json();
-    console.log("🌐 도메인 연결 응답:", domainData);
 
+    // ✅ 5. 실패 응답 핸들링
     if (!domainRes.ok) {
-      return res.status(500).json({ success: false, message: "도메인 연결 실패", raw: domainData });
+      console.error("❌ 도메인 연결 실패:", domainData);
+      return res.status(500).json({
+        success: false,
+        message: "도메인 연결 실패",
+        error: domainData,
+      });
     }
 
+    // ✅ 6. 성공 응답 반환
     return res.status(200).json({
       success: true,
-      message: "사이트 생성 및 도메인 연결 완료!",
-      url: `https://${domain}`
+      message: "도메인 연결 완료",
+      url: `https://${domain}`,
     });
 
   } catch (err) {
-    console.error("🔥 서버 오류 발생:", err);
-    return res.status(500).json({ success: false, message: "서버 오류", error: err.message });
+    // ✅ 7. 서버 에러 처리
+    console.error("🔥 서버 오류:", err);
+    return res.status(500).json({
+      success: false,
+      message: "서버 오류 발생",
+      error: err.message,
+    });
   }
 }
