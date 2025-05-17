@@ -69,4 +69,3 @@ const nextConfig = {
   // basePath: "/my-sub-path", // (선택) 서브디렉토리 배포 시 사용
 };
 
-export default nextConfig;
