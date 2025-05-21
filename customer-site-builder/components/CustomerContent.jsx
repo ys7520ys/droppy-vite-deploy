@@ -119,6 +119,57 @@
 
 
 
+// "use client";
+
+// import { useState, useEffect } from "react";
+// import TpHeader02 from "@/components/TpHeader/TpHeader02";
+// import TpBanner04 from "@/components/TpBanner/TpBanner04";
+// import { AnimatePresence } from "framer-motion";
+// import AnimatedPage from "@/components/AnimatedPage";
+
+// // ✅ "헤더02"도 등록
+// const componentMap = {
+//   헤더02: TpHeader02,
+//   배너04: TpBanner04,
+// };
+
+// export default function CustomerContent({ pageData }) {
+//   const [currentPageIndex, setCurrentPageIndex] = useState(0);
+
+//   useEffect(() => {
+//     window.scrollTo({ top: 0, behavior: "smooth" });
+//   }, [currentPageIndex]);
+
+//   return (
+//     <main style={{ background: "#000", color: "#fff", margin: 0, padding: 0 }}>
+//       {/* 🔥 헤더02도 컴포넌트에서 처리할 수 있도록 변경 */}
+//       <AnimatePresence mode="wait">
+//         <AnimatedPage key={currentPageIndex} index={currentPageIndex}>
+//           {pageData.pages?.[currentPageIndex]?.components?.map((comp, i) => {
+//             const Comp = componentMap[comp.type];
+//             return Comp ? (
+//               <Comp
+//                 key={i}
+//                 {...comp}
+//                 isPreview
+//                 setCurrentPageIndex={setCurrentPageIndex}
+//                 currentPageIndex={currentPageIndex}
+//               />
+//             ) : null;
+//           })}
+//         </AnimatedPage>
+//       </AnimatePresence>
+//     </main>
+//   );
+// }
+
+
+
+
+
+
+
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -127,7 +178,7 @@ import TpBanner04 from "@/components/TpBanner/TpBanner04";
 import { AnimatePresence } from "framer-motion";
 import AnimatedPage from "@/components/AnimatedPage";
 
-// ✅ "헤더02"도 등록
+// ✅ 등록된 컴포넌트 맵
 const componentMap = {
   헤더02: TpHeader02,
   배너04: TpBanner04,
@@ -136,24 +187,35 @@ const componentMap = {
 export default function CustomerContent({ pageData }) {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
+  // ✅ 페이지 전환 시 스크롤 맨 위로
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPageIndex]);
 
+  // ✅ pages 배열이 없거나 비었을 때 처리
+  if (!pageData?.pages || pageData.pages.length === 0) {
+    return (
+      <div style={{ padding: "100px", textAlign: "center", color: "#fff" }}>
+        ❌ 페이지 데이터가 없습니다
+      </div>
+    );
+  }
+
+  const currentPage = pageData.pages[currentPageIndex];
+
   return (
     <main style={{ background: "#000", color: "#fff", margin: 0, padding: 0 }}>
-      {/* 🔥 헤더02도 컴포넌트에서 처리할 수 있도록 변경 */}
       <AnimatePresence mode="wait">
         <AnimatedPage key={currentPageIndex} index={currentPageIndex}>
-          {pageData.pages?.[currentPageIndex]?.components?.map((comp, i) => {
+          {currentPage.components?.map((comp, i) => {
             const Comp = componentMap[comp.type];
             return Comp ? (
               <Comp
                 key={i}
                 {...comp}
                 isPreview
-                setCurrentPageIndex={setCurrentPageIndex}
                 currentPageIndex={currentPageIndex}
+                setCurrentPageIndex={setCurrentPageIndex}
               />
             ) : null;
           })}
@@ -162,4 +224,3 @@ export default function CustomerContent({ pageData }) {
     </main>
   );
 }
-

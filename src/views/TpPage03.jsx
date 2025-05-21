@@ -862,54 +862,68 @@ const handleDelete = (index) => {
       localStorage.removeItem("savedComponents");
     };
   
-const handleSubmitOrder = async () => {
-  if (!db) {
-    alert("Firestore가 초기화되지 않았습니다.");
-    return;
-  }
+    const handleSubmitOrder = async () => {
+      if (!db) {
+        alert("Firestore가 초기화되지 않았습니다.");
+        return;
+      }
 
-  if (!email || !name || !customDomain) {
-    alert("이름, 이메일, 도메인을 모두 입력해주세요.");
-    return;
-  }
+      if (!email || !name || !customDomain) {
+        alert("이름, 이메일, 도메인을 모두 입력해주세요.");
+        return;
+      }
 
-  const subdomain = customDomain.toLowerCase().replace(/\s+/g, "-");
-  const fullDomain = `${subdomain}.droppy.kr`;
+      const subdomain = customDomain.toLowerCase().replace(/\s+/g, "-");
+      const fullDomain = `${subdomain}.droppy.kr`;
 
-  try {
-    // ✅ 1. 주문 정보 Firestore에 저장
-    const docRef = await addDoc(collection(db, "orders"), {
-      user: { name, email },
-      domain: fullDomain,
-      pages,
-      headerType,
-      createdAt: serverTimestamp(),
-    });
+      try {
+        // ✅ 1. Firestore에 저장
+        const docRef = await addDoc(collection(db, "orders"), {
+          user: { name, email },
+          domain: fullDomain,
+          pages,
+          headerType,
+          createdAt: serverTimestamp(),
+        });
+        console.log("✅ docRef.id:", docRef.id); // 👈 이거 추가!
+        setOrderId(docRef.id);
+        clearSavedComponents();
 
-    setOrderId(docRef.id);
-    clearSavedComponents();
+        // ✅ 2. body 값 확인용 콘솔 로그
+        const deployPayload = {
+          domain: fullDomain,
+          orderId: docRef.id,
+        };
+        console.log("🚀 Netlify 배포 요청 payload:", deployPayload);
+        console.log("🚀 배포에 전달될 payload:", deployPayload);
+        // ✅ 3. Netlify 배포 함수 호출
+        const deployRes = await fetch("https://autodeploy-zifyt4iutq-uc.a.run.app", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json", // ✅ 꼭 있어야 함
+          },
+          body: JSON.stringify({
+            domain: fullDomain,
+            orderId: docRef.id,
+          }),
+        });
 
-    // ✅ 2. Netlify 자동 배포 함수 호출
-    const deployRes = await fetch("https://us-central1-salepage-f39a1.cloudfunctions.net/autoDeploy", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ domain: fullDomain }),
-    });
+        const deployData = await deployRes.json();
 
-    const deployData = await deployRes.json();
+        if (!deployRes.ok) {
+          console.error("🚨 Netlify 배포 실패:", deployData);
+          alert("사이트 생성 중 오류가 발생했습니다:\n" + deployData.message);
+          return;
+        }
 
-    if (!deployRes.ok) {
-      console.error("🚨 Netlify 배포 실패:", deployData);
-      alert("사이트 생성 중 오류가 발생했습니다:\n" + deployData.message);
-      return;
-    }
+        alert(`✅ 주문 및 사이트 생성 완료!\n\n👉 접속: https://${fullDomain}`);
+      } catch (err) {
+        console.error("🔥 전체 처리 중 오류:", err);
+        alert("에러 발생: " + err.message);
+      }
+    };
 
-    alert(`✅ 주문 및 사이트 생성 완료!\n\n👉 접속: https://${fullDomain}`);
-  } catch (err) {
-    console.error("🔥 전체 처리 중 오류:", err);
-    alert("에러 발생: " + err.message);
-  }
-};
+
 
     const handleDomainSubmit = async () => {
       if (!customDomain || !email || !name) {
@@ -934,7 +948,7 @@ const handleSubmitOrder = async () => {
         setOrderId(docRef.id);
 
         // ✅ Netlify 배포 API 호출
-        await fetch("https://us-central1-salepage-f39a1.cloudfunctions.net/autoDeploy", {
+        await fetch("https://autodeploy-zifyt4iutq-uc.a.run.app", {
           method: "POST",
           body: JSON.stringify({ domain: fullDomain, orderId: docRef.id }),
           headers: { "Content-Type": "application/json" },

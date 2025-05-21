@@ -7,6 +7,6 @@
     "rules": "storage.rules"
   },
   "functions": {
-    "source": "functions-v2"
+    "source": "functions"
   }
 }
