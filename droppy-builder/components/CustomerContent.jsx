@@ -116,8 +116,6 @@
 
 
 
-
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -126,10 +124,14 @@ import TpBanner04 from "@/components/TpBanner/TpBanner04";
 import { AnimatePresence } from "framer-motion";
 import AnimatedPage from "@/components/AnimatedPage";
 
-// ✅ 등록된 컴포넌트만 구성
+// ✅ 등록된 컴포넌트 매핑
 const componentMap = {
-  헤더02: TpHeader02,
   배너04: TpBanner04,
+};
+
+// ✅ 등록된 헤더 타입 매핑 (확장 가능)
+const headerMap = {
+  헤더02: TpHeader02,
 };
 
 export default function CustomerContent({ pageData }) {
@@ -139,43 +141,62 @@ export default function CustomerContent({ pageData }) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPageIndex]);
 
-  const currentPage = pageData?.pages?.[currentPageIndex];
+  const currentPage = pageData?.pages?.[currentPageIndex] || { components: [] };
+  const isValidComponents =
+    Array.isArray(currentPage.components) && currentPage.components.length > 0;
 
-  if (!currentPage || !Array.isArray(currentPage.components)) {
-    return (
-      <main style={{ padding: "100px", textAlign: "center", color: "#fff" }}>
-        ❌ 페이지 구성 요소가 없습니다
-      </main>
-    );
-  }
+  const HeaderComponent = headerMap[pageData.headerType];
 
   return (
     <main style={{ background: "#000", color: "#fff", margin: 0, padding: 0 }}>
+      {/* ✅ 고정된 헤더 */}
+      {HeaderComponent && (
+        <HeaderComponent
+          isPreview
+          setCurrentPageIndex={setCurrentPageIndex}
+          currentPageIndex={currentPageIndex}
+          menuItems={pageData.menuItems || []} // ✅ 이 부분 수정됨
+        />
+      )}
+
+      {/* ✅ 본문 전환만 애니메이션 처리 */}
       <AnimatePresence mode="wait">
         <AnimatedPage key={currentPageIndex} index={currentPageIndex}>
-          {currentPage.components.map((comp, i) => {
-            const Comp = componentMap[comp.type];
-            return Comp ? (
-              <Comp
-                key={i}
-                {...comp}
-                isPreview
-                setCurrentPageIndex={setCurrentPageIndex}
-                currentPageIndex={currentPageIndex}
-              />
-            ) : (
-              <div
-                key={i}
-                style={{
-                  padding: "60px",
-                  textAlign: "center",
-                  background: "#111",
-                }}
-              >
-                ⚠️ 알 수 없는 컴포넌트: <strong>{comp.type}</strong>
-              </div>
-            );
-          })}
+          {isValidComponents ? (
+            currentPage.components.map((comp, i) => {
+              const Comp = componentMap[comp.type];
+              return Comp ? (
+                <Comp
+                  key={i}
+                  {...comp}
+                  isPreview
+                  currentPageIndex={currentPageIndex}
+                  setCurrentPageIndex={setCurrentPageIndex}
+                />
+              ) : (
+                <div
+                  key={i}
+                  style={{
+                    padding: "60px",
+                    textAlign: "center",
+                    background: "#111",
+                  }}
+                >
+                  ⚠️ 알 수 없는 컴포넌트: <strong>{comp.type}</strong>
+                </div>
+              );
+            })
+          ) : (
+            <div
+              style={{
+                padding: "100px",
+                textAlign: "center",
+                color: "#fff",
+              }}
+            >
+              ❌ 페이지 구성 요소가 없습니다
+            </div>
+          )}
         </AnimatedPage>
       </AnimatePresence>
     </main>

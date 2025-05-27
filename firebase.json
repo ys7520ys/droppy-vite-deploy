@@ -6,7 +6,21 @@
   "storage": {
     "rules": "storage.rules"
   },
-  "functions": {
-    "source": "functions"
-  }
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default"
+    },
+    {
+      "source": "droppy",
+      "codebase": "droppy",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
 }

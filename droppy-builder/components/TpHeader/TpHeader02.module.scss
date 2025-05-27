@@ -21,17 +21,18 @@
     background: none;
     border: none;
     color: white;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.3s ease;
     
     &:hover {
-      opacity: 0.8;
+      opacity: 0.5;
     }
 
     &.active {
-      text-decoration: underline;
+      // text-decoration: underline;
       font-weight: bold;
+      font-size: 20px;
     }
   }
 }

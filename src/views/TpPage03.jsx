@@ -391,7 +391,13 @@ function TpPage03() {
   const initialPage = parseInt(queryParams.get("page") || "0", 10);
   const [orderId, setOrderId] = useState(null); // 🔥 추가
 
-  const [pages, setPages] = useState([{ id: Date.now(), components: [], menuItems: defaultMenus }]);
+  // const [pages, setPages] = useState([{ id: Date.now(), components: [], menuItems: defaultMenus }]);
+  const [menuItems, setMenuItems] = useState(defaultMenus); // 메뉴 전역 상태로 분리
+  const [pages, setPages] = useState([
+    { id: Date.now(), components: [] } // 각 page에는 menuItems 빼기
+  ]);
+
+
   const [currentPage, setCurrentPage] = useState(0);
   const [products, setProducts] = useState([]);
   const [email, setEmail] = useState("");
@@ -465,18 +471,22 @@ const [customDomain, setCustomDomain] = useState(""); // ✅ 이 줄 추가!
     }
   };
 
-  const handleSelectSite = (siteData) => {
-    // pages의 각 요소에 menuItems가 없으면 defaultMenus로 보완
-    const fixedPages = (siteData.pages || []).map(page => ({
-      ...page,
-      menuItems: page.menuItems || defaultMenus
-    }));
-    setPages(fixedPages);
-    setOrderId(siteData.id);
-    setHeaderType(siteData.headerType || "헤더02"); // 헤더 타입 복원
-    setShowModal(false);
-    navigate("/preview", { state: { pages: fixedPages, headerType: siteData.headerType || "헤더02" } });
-  };
+const handleSelectSite = (siteData) => {
+  setPages(siteData.pages || []);
+  setMenuItems(siteData.menuItems || defaultMenus); // 🔧 전역 menuItems 상태로 분리 저장
+  setOrderId(siteData.id);
+  setHeaderType(siteData.headerType || "헤더02");
+  setShowModal(false);
+
+  // 🔁 미리보기로 이동할 때도 menuItems를 함께 전달해줘야 해
+  navigate("/preview", {
+    state: {
+      pages: siteData.pages || [],
+      headerType: siteData.headerType || "헤더02",
+      menuItems: siteData.menuItems || defaultMenus,
+    },
+  });
+};
   
   
   // 🔥 사이트 전체 삭제 함수
@@ -941,17 +951,24 @@ const handleDelete = (index) => {
           user: { name, email },
           domain: fullDomain,
           pages,
+          menuItems, // 전역 상태로 분리한 menuItems 추가
           headerType,
           createdAt: serverTimestamp(),
         });
 
         setOrderId(docRef.id);
-
+        console.log("✅ 저장된 도메인:", fullDomain);
+        console.log("✅ 저장된 주문 ID:", docRef.id);
         // ✅ Netlify 배포 API 호출
         await fetch("https://autodeploy-zifyt4iutq-uc.a.run.app", {
           method: "POST",
-          body: JSON.stringify({ domain: fullDomain, orderId: docRef.id }),
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            domain: fullDomain,
+            orderId: docRef.id,
+          }),
         });
 
         alert(`주문 완료! 사이트 주소: https://${fullDomain}`);
@@ -1182,7 +1199,7 @@ const handlePreview = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <TpHeaderUser headerType={headerType}
+      {/* <TpHeaderUser headerType={headerType}
         user={null}
         pages={pages}
         menuItems={pages[currentPage]?.menuItems || defaultMenus}
@@ -1192,6 +1209,17 @@ const handlePreview = () => {
         isPreview={false}
         orderId={orderId}
       />
+       */}
+       <TpHeaderUser
+        headerType={headerType}
+        user={null}
+        pages={pages}
+        menuItems={menuItems} // 🔁 전역 상태 전달
+        setMenuItems={setMenuItems} // 🔁 전역 setter 전달
+        isPreview={false}
+        orderId={orderId}
+      />
+
       <div style={{ paddingTop: 20, background: "#222", minHeight: "100vh" }}>
         {/* 컴포넌트 메뉴 열기 버튼 - 하단 우측 고정 */}
         <div style={{ position: "fixed", bottom: 40, left: 40, zIndex: 2000 }}>
@@ -1605,29 +1633,34 @@ const handlePreview = () => {
             )}
           </div>
         ))}
-        <button
-          onClick={() => {
-            const headerComp = pages.find(page => page.components.some(c => c.type === "헤더02"))?.components.find(c => c.type === "헤더02");
-            setPages([
-              ...pages,
-              {
-                id: Date.now(),
-                components: headerComp ? [ { ...headerComp, id: Date.now() + Math.random() } ] : [],
-                menuItems: defaultMenus
-              }
-            ]);
-            setCurrentPage(pages.length);
-          }}
-          style={{
-            padding: "8px 16px",
-            marginLeft: 8,
-            border: "1px dashed #888",
-            borderRadius: 4,
-            backgroundColor: "#eee",
-          }}
-        >
-          + 페이지 추가
-        </button>
+      <button
+        onClick={() => {
+          const headerComp = pages.find(page =>
+            page.components.some(c => c.type === "헤더02")
+          )?.components.find(c => c.type === "헤더02");
+
+          setPages([
+            ...pages,
+            {
+              id: Date.now(),
+              components: headerComp
+                ? [{ ...headerComp, id: Date.now() + Math.random() }]
+                : [],
+              menuItems: menuItems // 🔧 현재 상태에서 복사
+            }
+          ]);
+          setCurrentPage(pages.length);
+        }}
+        style={{
+          padding: "8px 16px",
+          marginLeft: 8,
+          border: "1px dashed #888",
+          borderRadius: 4,
+          backgroundColor: "#eee",
+        }}
+      >
+        + 페이지 추가
+      </button>
       </div>
     </motion.div>
   )}

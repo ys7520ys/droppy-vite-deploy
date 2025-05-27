@@ -395,12 +395,13 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // ✅ 현재 도메인에서 subdomain 추출 (예: test.droppy.kr → test)
-      const subdomain = window.location.hostname.split(".")[0];
+      // ✅ 클라이언트에서만 실행
+      const hostname = window.location.hostname;
+      const subdomain = hostname.split(".")[0];
 
       try {
         const res = await fetch(
-          `https://autodeploy-zifyt4iutq-uc.a.run.app/getPageData?id=${subdomain}`
+          `https://getpagedata-zifyt4iutq-uc.a.run.app/getPageData?id=${subdomain}`
         );
         const result = await res.json();
 
@@ -418,6 +419,7 @@ export default function Home() {
 
     fetchData();
   }, []);
+
 
   if (loading) {
     return (
