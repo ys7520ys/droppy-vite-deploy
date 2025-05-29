@@ -76,15 +76,13 @@
 // };
 // module.exports = nextConfig;
 
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // ✅ 정적 사이트 export 모드
-  trailingSlash: true, // ✅ 모든 경로에 '/' 붙이기 (Netlify에서 필수!)
+  output: 'export',
   reactStrictMode: true,
   images: {
-    unoptimized: true, // ✅ next/image 최적화 비활성화 (export에 필수)
+    unoptimized: true,
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;

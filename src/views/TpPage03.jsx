@@ -941,17 +941,25 @@ const handleDelete = (index) => {
         return;
       }
 
-      try {
-        // ✅ 입력한 customDomain 값을 기반으로 전체 도메인 구성 (예: first → first.droppy.kr)
-        const subdomain = customDomain.toLowerCase().replace(/\s+/g, "-"); // 공백 제거 및 소문자 처리
-        const fullDomain = `${subdomain}.droppy.kr`;
+      // ✅ 공백 제거 및 소문자 처리
+      const subdomain = customDomain.toLowerCase().replace(/\s+/g, "-");
 
-        // ✅ Firestore에 저장
+      // ✅ 형식 유효성 검사: 영문 소문자, 숫자, 하이픈만 허용
+      const isValid = /^[a-z0-9-]+$/.test(subdomain);
+      if (!isValid) {
+        alert("도메인은 영문 소문자, 숫자, 하이픈(-)만 사용할 수 있습니다.");
+        return;
+      }
+
+      const fullDomain = `${subdomain}.droppy.kr`;
+
+      try {
+        // ✅ Firestore에 주문 정보 저장
         const docRef = await addDoc(collection(db, "orders"), {
           user: { name, email },
           domain: fullDomain,
           pages,
-          menuItems, // 전역 상태로 분리한 menuItems 추가
+          menuItems, // 메뉴 항목 저장
           headerType,
           createdAt: serverTimestamp(),
         });
@@ -959,8 +967,9 @@ const handleDelete = (index) => {
         setOrderId(docRef.id);
         console.log("✅ 저장된 도메인:", fullDomain);
         console.log("✅ 저장된 주문 ID:", docRef.id);
-        // ✅ Netlify 배포 API 호출
-        await fetch("https://autodeploy-zifyt4iutq-uc.a.run.app", {
+
+        // ✅ Firebase Functions를 통한 자동 배포 요청
+        const response = await fetch("https://autodeploy-zifyt4iutq-uc.a.run.app", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -971,12 +980,19 @@ const handleDelete = (index) => {
           }),
         });
 
-        alert(`주문 완료! 사이트 주소: https://${fullDomain}`);
+        const data = await response.json();
+        if (!response.ok) {
+          console.error("🔥 배포 실패 응답:", data);
+          throw new Error(`배포 실패: ${data.message || "알 수 없는 오류"}`);
+        }
+
+        alert(`🎉 주문 완료! 사이트 주소: https://${fullDomain}`);
       } catch (err) {
         console.error("🔥 도메인 주문 실패:", err);
-        alert("저장 또는 배포에 실패했습니다.");
+        alert("도메인 저장 또는 배포에 실패했습니다. 다시 시도해주세요.");
       }
     };
+
 
 
   const handleBuild = () => {

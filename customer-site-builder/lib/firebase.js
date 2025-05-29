@@ -32,6 +32,9 @@ const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: "salepage-f39a1.firebasestorage.app",
+  messagingSenderId: "237790668185",
+  appId: "1:237790668185:web:22efc56494976505369f08",
 };
 
 // 중복 초기화 방지
