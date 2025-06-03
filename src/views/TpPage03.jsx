@@ -935,16 +935,135 @@ const handleDelete = (index) => {
 
 
 
+    // const handleDomainSubmit = async () => {
+    //   if (!customDomain || !email || !name) {
+    //     alert("이름, 이메일, 도메인을 모두 입력해주세요.");
+    //     return;
+    //   }
+
+    //   // ✅ 공백 제거 및 소문자 처리
+    //   const subdomain = customDomain.toLowerCase().replace(/\s+/g, "-");
+
+    //   // ✅ 형식 유효성 검사: 영문 소문자, 숫자, 하이픈만 허용
+    //   const isValid = /^[a-z0-9-]+$/.test(subdomain);
+    //   if (!isValid) {
+    //     alert("도메인은 영문 소문자, 숫자, 하이픈(-)만 사용할 수 있습니다.");
+    //     return;
+    //   }
+
+    //   const fullDomain = `${subdomain}.droppy.kr`;
+
+    //   try {
+    //     // ✅ Firestore에 주문 정보 저장
+    //     const docRef = await addDoc(collection(db, "orders"), {
+    //       user: { name, email },
+    //       domain: fullDomain,
+    //       pages,
+    //       menuItems, // 메뉴 항목 저장
+    //       headerType,
+    //       createdAt: serverTimestamp(),
+    //     });
+
+    //     setOrderId(docRef.id);
+    //     console.log("✅ 저장된 도메인:", fullDomain);
+    //     console.log("✅ 저장된 주문 ID:", docRef.id);
+
+    //     // ✅ Firebase Functions를 통한 자동 배포 요청
+    //     const response = await fetch("https://autodeploy-zifyt4iutq-uc.a.run.app", {
+    //       method: "POST",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //       body: JSON.stringify({
+    //         domain: fullDomain,
+    //         orderId: docRef.id,
+    //       }),
+    //     });
+
+    //     const data = await response.json();
+    //     if (!response.ok) {
+    //       console.error("🔥 배포 실패 응답:", data);
+    //       throw new Error(`배포 실패: ${data.message || "알 수 없는 오류"}`);
+    //     }
+
+    //     alert(`🎉 주문 완료! 사이트 주소: https://${fullDomain}`);
+    //   } catch (err) {
+    //     console.error("🔥 도메인 주문 실패:", err);
+    //     alert("도메인 저장 또는 배포에 실패했습니다. 다시 시도해주세요.");
+    //   }
+    // };
+    // const handleDomainSubmit = async () => {
+    //   if (!customDomain || !email || !name) {
+    //     alert("이름, 이메일, 도메인을 모두 입력해주세요.");
+    //     return;
+    //   }
+
+    //   // ✅ 1. 도메인 전처리 및 유효성 검사
+    //   const subdomain = customDomain.toLowerCase().replace(/\s+/g, "-");
+    //   const isValid = /^[a-z0-9-]+$/.test(subdomain);
+    //   if (!isValid) {
+    //     alert("도메인은 영문 소문자, 숫자, 하이픈(-)만 사용할 수 있습니다.");
+    //     return;
+    //   }
+    //   const fullDomain = `${subdomain}.droppy.kr`;
+
+    //   try {
+    //     // ✅ 2. Firestore에 주문 정보 저장
+    //     const docRef = await addDoc(collection(db, "orders"), {
+    //       user: { name, email },
+    //       domain: fullDomain,
+    //       pages,
+    //       menuItems,
+    //       headerType,
+    //       createdAt: serverTimestamp(),
+    //     });
+
+    //     setOrderId(docRef.id);
+    //     console.log("✅ 저장된 도메인:", fullDomain);
+    //     console.log("✅ 저장된 주문 ID:", docRef.id);
+
+    //     // ✅ 3. build + .next/static 복사 (백엔드 서버에서 자동 처리)
+    //     const buildRes = await fetch("/api/autobuild");
+    //     const buildJson = await buildRes.json();
+    //     if (!buildRes.ok) {
+    //       console.error("❌ 자동 빌드 실패:", buildJson);
+    //       throw new Error("빌드 또는 복사 과정에서 오류 발생");
+    //     }
+    //     console.log("✅ 자동 빌드 성공");
+
+    //     // ✅ 4. Firebase Functions로 Netlify 배포 요청
+    //     const response = await fetch("https://autodeploy-zifyt4iutq-uc.a.run.app", {
+    //       method: "POST",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //       body: JSON.stringify({
+    //         domain: fullDomain,
+    //         orderId: docRef.id,
+    //       }),
+    //     });
+
+    //     const data = await response.json();
+    //     if (!response.ok) {
+    //       console.error("🔥 배포 실패 응답:", data);
+    //       throw new Error(`배포 실패: ${data.message || "알 수 없는 오류"}`);
+    //     }
+
+    //     alert(`🎉 주문 완료! 사이트 주소: https://${fullDomain}`);
+    //   } catch (err) {
+    //     console.error("🔥 도메인 주문 실패:", err);
+    //     alert("도메인 저장 또는 배포에 실패했습니다. 다시 시도해주세요.");
+    //   }
+    // };
+
+
     const handleDomainSubmit = async () => {
       if (!customDomain || !email || !name) {
         alert("이름, 이메일, 도메인을 모두 입력해주세요.");
         return;
       }
 
-      // ✅ 공백 제거 및 소문자 처리
       const subdomain = customDomain.toLowerCase().replace(/\s+/g, "-");
-
-      // ✅ 형식 유효성 검사: 영문 소문자, 숫자, 하이픈만 허용
       const isValid = /^[a-z0-9-]+$/.test(subdomain);
       if (!isValid) {
         alert("도메인은 영문 소문자, 숫자, 하이픈(-)만 사용할 수 있습니다.");
@@ -954,12 +1073,12 @@ const handleDelete = (index) => {
       const fullDomain = `${subdomain}.droppy.kr`;
 
       try {
-        // ✅ Firestore에 주문 정보 저장
+        // ✅ Firestore 저장
         const docRef = await addDoc(collection(db, "orders"), {
           user: { name, email },
           domain: fullDomain,
           pages,
-          menuItems, // 메뉴 항목 저장
+          menuItems,
           headerType,
           createdAt: serverTimestamp(),
         });
@@ -968,7 +1087,7 @@ const handleDelete = (index) => {
         console.log("✅ 저장된 도메인:", fullDomain);
         console.log("✅ 저장된 주문 ID:", docRef.id);
 
-        // ✅ Firebase Functions를 통한 자동 배포 요청
+        // ✅ 바로 Firebase Functions로 배포 요청
         const response = await fetch("https://autodeploy-zifyt4iutq-uc.a.run.app", {
           method: "POST",
           headers: {
@@ -992,6 +1111,7 @@ const handleDelete = (index) => {
         alert("도메인 저장 또는 배포에 실패했습니다. 다시 시도해주세요.");
       }
     };
+
 
 
 

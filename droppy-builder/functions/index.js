@@ -2262,12 +2262,250 @@
 // );
 
 
+
+
+
+// 제대로 된 코드드
+// const { onRequest } = require("firebase-functions/v2/https");
+// const { defineSecret } = require("firebase-functions/params");
+// const logger = require("firebase-functions/logger");
+// const { initializeApp, applicationDefault } = require("firebase-admin/app");
+// const { getFirestore } = require("firebase-admin/firestore");
+// const fs = require("fs");
+// const path = require("path");
+// const archiver = require("archiver");
+// const fetch = require("node-fetch");
+
+// initializeApp({ credential: applicationDefault() });
+// const db = getFirestore();
+
+// // ✅ Functions 디렉토리 내부의 out 폴더 기준
+// const PROJECT_DIR = path.resolve(__dirname, "./out");
+
+// const SITE_ID = "2aff56be-e5a4-47da-90f3-e81068b0e958";
+// const NETLIFY_TOKEN = defineSecret("NETLIFY_TOKEN");
+
+// exports.autoDeploy = onRequest(
+//   {
+//     cors: true,
+//     secrets: [NETLIFY_TOKEN],
+//   },
+//   async (req, res) => {
+//     try {
+//       const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+//       const { domain } = body;
+
+//       logger.info("📨 전달받은 body:", body);
+
+//       if (!domain || typeof domain !== "string" || !domain.includes(".")) {
+//         return res.status(400).json({ message: "❗ 유효하지 않은 도메인 형식입니다" });
+//       }
+
+//       const snapshot = await db.collection("orders")
+//         .where("domain", "==", domain)
+//         .limit(1)
+//         .get();
+
+//       if (snapshot.empty) {
+//         return res.status(404).json({ message: "❌ 도메인으로 주문 데이터 없음" });
+//       }
+
+//       const doc = snapshot.docs[0];
+//       const orderId = doc.id;
+//       const orderData = doc.data();
+//       logger.info("📦 주문 데이터 로드 완료:", orderData);
+
+//       // ✅ 압축 생성
+//       const zipPath = `/tmp/${orderId}.zip`;
+//       const output = fs.createWriteStream(zipPath);
+//       const archive = archiver("zip", { zlib: { level: 9 } });
+//       archive.pipe(output);
+
+//       // ✅ out 내부 파일들을 zip 루트에 넣음
+//       archive.directory(PROJECT_DIR + "/", false);
+
+//       // ✅ 압축 완료를 보장 (중요!)
+//       await new Promise((resolve, reject) => {
+//         output.on("close", resolve);
+//         output.on("error", reject);
+//         archive.finalize();
+//       });
+
+//       logger.info("📦 압축 완료:", zipPath);
+
+//       // ✅ Netlify 업로드
+//       const zipBuffer = fs.readFileSync(zipPath);
+//       const deployRes = await fetch(`https://api.netlify.com/api/v1/sites/${SITE_ID}/deploys`, {
+//         method: "POST",
+//         headers: {
+//           Authorization: `Bearer ${NETLIFY_TOKEN.value()}`,
+//           "Content-Type": "application/zip",
+//         },
+//         body: zipBuffer,
+//       });
+
+//       const deployJson = await deployRes.json();
+//       logger.info("🚀 Netlify 응답:", deployJson);
+
+//       if (!deployRes.ok) {
+//         return res.status(500).json({ message: "❌ 배포 실패", detail: deployJson });
+//       }
+
+//       return res.status(200).json({
+//         message: "🎉 배포 성공!",
+//         previewUrl: deployJson.deploy_ssl_url,
+//         customDomainUrl: `https://${domain}`,
+//       });
+
+//     } catch (err) {
+//       logger.error("🔥 오류 발생:", err.stack || err);
+//       return res.status(500).json({ message: "서버 오류", error: err.message });
+//     }
+//   }
+// );
+
+
+
+
+
+
+
+
+
+// const { onRequest } = require("firebase-functions/v2/https");
+// const { defineSecret } = require("firebase-functions/params");
+// const logger = require("firebase-functions/logger");
+// const { initializeApp, applicationDefault } = require("firebase-admin/app");
+// const { getFirestore } = require("firebase-admin/firestore");
+// const fs = require("fs");
+// const path = require("path");
+// const archiver = require("archiver");
+// const fetch = require("node-fetch");
+
+// initializeApp({ credential: applicationDefault() });
+// const db = getFirestore();
+
+// const PROJECT_DIR = path.resolve(__dirname, "./out");
+
+// const SITE_ID = "2aff56be-e5a4-47da-90f3-e81068b0e958";
+// const NETLIFY_TOKEN = defineSecret("NETLIFY_TOKEN");
+
+// exports.autoDeploy = onRequest(
+//   {
+//     cors: true,
+//     secrets: [NETLIFY_TOKEN],
+//   },
+//   async (req, res) => {
+//     try {
+//       const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+//       const { domain } = body;
+
+//       logger.info("📨 전달받은 body:", body);
+
+//       if (!domain || typeof domain !== "string" || !domain.includes(".")) {
+//         return res.status(400).json({ message: "❗ 유효하지 않은 도메인 형식입니다" });
+//       }
+
+//       const snapshot = await db.collection("orders")
+//         .where("domain", "==", domain)
+//         .limit(1)
+//         .get();
+
+//       if (snapshot.empty) {
+//         return res.status(404).json({ message: "❌ 도메인으로 주문 데이터 없음" });
+//       }
+
+//       const doc = snapshot.docs[0];
+//       const orderId = doc.id;
+//       const orderData = doc.data();
+//       logger.info("📦 주문 데이터 로드 완료:", orderData);
+
+//       // ✅ 고객 폴더 경로 설정
+//       const subdomain = domain.split(".")[0];
+//       const customerDir = path.join(PROJECT_DIR, "customer", subdomain);
+//       fs.mkdirSync(customerDir, { recursive: true });
+
+//       // ✅ 고객 데이터 저장
+//       fs.writeFileSync(
+//         path.join(customerDir, "pageData.json"),
+//         JSON.stringify(orderData, null, 2),
+//         "utf-8"
+//       );
+
+//       // ✅ CSR 기반 index.html 생성
+//       const html = `
+// <!DOCTYPE html>
+// <html lang="ko">
+// <head>
+//   <meta charset="UTF-8" />
+//   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+//   <title>${orderData.pages?.[0]?.components?.[0]?.title || "Droppy"}</title>
+// </head>
+// <body style="margin:0;background:#000;color:#fff;">
+//   <div id="__next">🔄 로딩 중...</div>
+//   <script src="/_next/static/chunks/main.js"></script>
+// </body>
+// </html>
+//       `.trim();
+
+//       fs.writeFileSync(path.join(customerDir, "index.html"), html, "utf-8");
+
+//       logger.info(`✅ 고객 폴더 생성 완료: ${customerDir}`);
+
+//       // ✅ 전체 압축 파일 생성
+//       const zipPath = `/tmp/${orderId}.zip`;
+//       const output = fs.createWriteStream(zipPath);
+//       const archive = archiver("zip", { zlib: { level: 9 } });
+//       archive.pipe(output);
+//       archive.directory(PROJECT_DIR + "/", false);
+
+//       await new Promise((resolve, reject) => {
+//         output.on("close", resolve);
+//         output.on("error", reject);
+//         archive.finalize();
+//       });
+
+//       logger.info("📦 압축 완료:", zipPath);
+
+//       // ✅ Netlify 업로드
+//       const zipBuffer = fs.readFileSync(zipPath);
+//       const deployRes = await fetch(`https://api.netlify.com/api/v1/sites/${SITE_ID}/deploys`, {
+//         method: "POST",
+//         headers: {
+//           Authorization: `Bearer ${NETLIFY_TOKEN.value()}`,
+//           "Content-Type": "application/zip",
+//         },
+//         body: zipBuffer,
+//       });
+
+//       const deployJson = await deployRes.json();
+//       logger.info("🚀 Netlify 응답:", deployJson);
+
+//       if (!deployRes.ok) {
+//         return res.status(500).json({ message: "❌ 배포 실패", detail: deployJson });
+//       }
+
+//       return res.status(200).json({
+//         message: "🎉 배포 성공!",
+//         previewUrl: deployJson.deploy_ssl_url,
+//         customerUrl: `https://${domain}`,
+//         subdomainPath: `/customer/${subdomain}/`, // 예: /customer/hhaaa/
+//       });
+
+//     } catch (err) {
+//       logger.error("🔥 오류 발생:", err.stack || err);
+//       return res.status(500).json({ message: "서버 오류", error: err.message });
+//     }
+//   }
+// );
+
 const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
 const { initializeApp, applicationDefault } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 const fs = require("fs");
+const fsExtra = require("fs-extra"); // ✅ fs-extra 추가
 const path = require("path");
 const archiver = require("archiver");
 const fetch = require("node-fetch");
@@ -2275,15 +2513,9 @@ const fetch = require("node-fetch");
 initializeApp({ credential: applicationDefault() });
 const db = getFirestore();
 
-// ✅ 압축할 디렉터리: droppy-builder 내부 파일 기준
-const PROJECT_DIR = path.resolve(__dirname, "../../droppy-builder");
-
-// ✅ Netlify droppy-main site ID 및 시크릿
+const PROJECT_DIR = path.resolve(__dirname, "./out");
 const SITE_ID = "2aff56be-e5a4-47da-90f3-e81068b0e958";
 const NETLIFY_TOKEN = defineSecret("NETLIFY_TOKEN");
-
-// ❌ 제외할 폴더 (빌드 산출물 등)
-const EXCLUDE_FOLDERS = [".next", "out", "node_modules", ".git", ".firebase", ".DS_Store"];
 
 exports.autoDeploy = onRequest(
   {
@@ -2295,12 +2527,11 @@ exports.autoDeploy = onRequest(
       const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
       const { domain } = body;
 
-      logger.info("📨 전달받은 body:", body);
-
       if (!domain || typeof domain !== "string" || !domain.includes(".")) {
         return res.status(400).json({ message: "❗ 유효하지 않은 도메인 형식입니다" });
       }
 
+      // 🔍 주문 정보 조회
       const snapshot = await db.collection("orders")
         .where("domain", "==", domain)
         .limit(1)
@@ -2313,25 +2544,87 @@ exports.autoDeploy = onRequest(
       const doc = snapshot.docs[0];
       const orderId = doc.id;
       const orderData = doc.data();
-      logger.info("📦 주문 데이터 로드 완료:", orderData);
+      const subdomain = domain.split(".")[0];
 
-      // ✅ 압축 생성
+      // ✅ _next/static 자동 복사
+      const NEXT_STATIC_SOURCE = path.join(__dirname, "..", ".next", "static");
+      const NEXT_STATIC_DEST = path.join(PROJECT_DIR, "_next", "static");
+      fsExtra.mkdirpSync(NEXT_STATIC_DEST);
+      fsExtra.copySync(NEXT_STATIC_SOURCE, NEXT_STATIC_DEST, { recursive: true });
+
+      // ✅ 고객 디렉토리 생성 및 데이터 저장
+      const customerDir = path.join(PROJECT_DIR, "customer", subdomain);
+      fs.mkdirSync(customerDir, { recursive: true });
+
+      fs.writeFileSync(
+        path.join(customerDir, "pageData.json"),
+        JSON.stringify(orderData, null, 2),
+        "utf-8"
+      );
+
+      // ✅ 고객 전용 index.html (CSR 진입점)
+      const customerHTML = `
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${orderData.pages?.[0]?.components?.[0]?.title || "Droppy"}</title>
+    <script defer src="/_next/static/chunks/main.js"></script>
+    <script defer src="/_next/static/chunks/pages/_app.js"></script>
+    <script defer src="/_next/static/chunks/pages/customer/[subdomain].js"></script>
+    <link rel="stylesheet" href="/_next/static/css/app.css" />
+  </head>
+  <body style="margin:0;background:#000;color:#fff;">
+    <div id="__next">🔄 고객 콘텐츠 로딩 중...</div>
+  </body>
+</html>
+      `.trim();
+
+      fs.writeFileSync(path.join(customerDir, "index.html"), customerHTML, "utf-8");
+      logger.info(`📄 customer index.html 생성됨: ${fs.existsSync(path.join(customerDir, "index.html"))}`);
+
+      // ✅ 루트 index.html → 리디렉션
+      const redirectHTML = `
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta http-equiv="refresh" content="0;url=/customer/${subdomain}/" />
+    <title>Redirecting...</title>
+  </head>
+  <body style="background:#000; color:#fff; text-align:center; padding:100px;">
+    ⏳ 잠시만 기다려 주세요... 고객 페이지로 이동 중입니다.
+  </body>
+</html>
+      `.trim();
+
+      fs.writeFileSync(path.join(PROJECT_DIR, "index.html"), redirectHTML, "utf-8");
+      logger.info(`📄 루트 index.html 생성됨: ${fs.existsSync(path.join(PROJECT_DIR, "index.html"))}`);
+
+      // ✅ 압축 및 배포
       const zipPath = `/tmp/${orderId}.zip`;
       const output = fs.createWriteStream(zipPath);
       const archive = archiver("zip", { zlib: { level: 9 } });
+
       archive.pipe(output);
 
-      // ✅ droppy-builder 내부 파일을 루트에 압축
-      archive.glob("**/*", {
-        cwd: PROJECT_DIR,
-        ignore: EXCLUDE_FOLDERS.map((folder) => `${folder}/**`),
-        dot: true,
+      archive.directory(path.join(PROJECT_DIR, "_next"), "_next");
+      archive.directory(path.join(PROJECT_DIR, "customer"), "customer");
+      archive.file(path.join(PROJECT_DIR, "index.html"), { name: "index.html" });
+
+      const redirectsPath = path.join(PROJECT_DIR, "_redirects");
+      if (fs.existsSync(redirectsPath)) {
+        archive.file(redirectsPath, { name: "_redirects" });
+      }
+
+      await new Promise((resolve, reject) => {
+        output.on("close", resolve);
+        output.on("error", reject);
+        archive.finalize();
       });
 
-      await archive.finalize();
-      logger.info("📦 압축 완료:", zipPath);
+      logger.info(`📦 압축 완료: ${zipPath}`);
 
-      // ✅ Netlify 업로드 요청
       const zipBuffer = fs.readFileSync(zipPath);
       const deployRes = await fetch(`https://api.netlify.com/api/v1/sites/${SITE_ID}/deploys`, {
         method: "POST",
@@ -2352,11 +2645,12 @@ exports.autoDeploy = onRequest(
       return res.status(200).json({
         message: "🎉 배포 성공!",
         previewUrl: deployJson.deploy_ssl_url,
-        customDomainUrl: `https://${domain}`,
+        customerUrl: `https://${domain}`,
+        subdomainPath: `/customer/${subdomain}/`,
       });
 
     } catch (err) {
-      logger.error("🔥 오류 발생:", err);
+      logger.error("🔥 오류 발생:", err.stack || err);
       return res.status(500).json({ message: "서버 오류", error: err.message });
     }
   }
