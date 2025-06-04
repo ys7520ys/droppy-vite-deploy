@@ -7,9 +7,6 @@ functions = "functions"
 node_bundler = "esbuild"           
 
 [[plugins]]
-package = "@netlify/plugin-nextjs"
-
-[[plugins]]
 package = "@netlify/plugin-functions-install-core" 
 
 [[redirects]]

@@ -76,13 +76,49 @@
 // };
 // module.exports = nextConfig;
 
-/** @type {import('next').NextConfig} */
+
+//멀쩡한 상태
+// /** @type {import('next').NextConfig} */
+// const nextConfig = {
+//   output: 'export',
+//   reactStrictMode: true,
+//   images: {
+//     unoptimized: true,
+//   },
+// };
+
+// module.exports = nextConfig; 
+
+
+
+
+// /** @type {import('next').NextConfig} */
+// const nextConfig = {
+//   output: 'export',
+//   reactStrictMode: true,
+//   images: {
+//     unoptimized: true,
+//   },
+//   trailingSlash: true, // ✅ export 후 슬래시 유지
+//   webpack: (config) => {
+//     config.output.filename = 'static/chunks/[name].js'; // ✅ JS 이름 고정
+//     return config;
+//   },
+// };
+
+// module.exports = nextConfig;
+
+
+
+
+
+
+
+
+// next.config.js
 const nextConfig = {
-  output: 'export',
-  reactStrictMode: true,
-  images: {
-    unoptimized: true,
-  },
+  output: "export", // ✅ export 모드로 전환
+  trailingSlash: true, // ✅ /index.html 로 접근하게 하기 위해
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;
