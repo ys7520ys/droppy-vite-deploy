@@ -2964,7 +2964,6 @@
 //     }
 //   }
 // );
-
 const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
@@ -2976,17 +2975,12 @@ const path = require("path");
 const fetch = require("node-fetch");
 const archiver = require("archiver");
 const { spawnSync } = require("child_process");
+const os = require("os");
 
 const NETLIFY_TOKEN = defineSecret("NETLIFY_TOKEN");
 
 initializeApp({ credential: applicationDefault() });
 const db = getFirestore();
-
-// ✅ 경로 설정
-const FUNCTION_DIR = __dirname;
-const TEMPLATE_DIR = path.join(FUNCTION_DIR, "..", "vite-template");
-const PUBLIC_DIR = path.join(TEMPLATE_DIR, "public");
-const DIST_DIR = path.join(TEMPLATE_DIR, "dist");
 
 const SITE_ID = "c582cf04-18cd-497a-89c3-f2820c7ba85b";
 
@@ -3006,34 +3000,40 @@ exports.autoDeploy = onRequest(
 
       logger.info(`📦 주문 도메인: ${domain}, 주문 ID: ${orderId}`);
 
+      // ✅ 주문 정보 가져오기
       const snapshot = await db.collection("orders").where("domain", "==", domain).limit(1).get();
       if (snapshot.empty) {
         return res.status(404).json({ message: "❌ Firestore에 해당 도메인 주문 정보 없음" });
       }
-
       const orderData = snapshot.docs[0].data();
 
+      // ✅ /tmp 하위에 작업 디렉토리 복사
+      const TEMPLATE_SRC = path.join(__dirname, "../vite-template");
+      const TEMP_DIR = path.join(os.tmpdir(), `template-${orderId}`);
+      fsExtra.copySync(TEMPLATE_SRC, TEMP_DIR);
+
+      const PUBLIC_DIR = path.join(TEMP_DIR, "public");
+      const DIST_DIR = path.join(TEMP_DIR, "dist");
+
       // ✅ data.json 저장
-      const dataPath = path.join(PUBLIC_DIR, "data.json");
-      fsExtra.ensureDirSync(PUBLIC_DIR); // 퍼미션 에러 방지
-      fs.writeFileSync(dataPath, JSON.stringify(orderData, null, 2), "utf-8");
+      fsExtra.ensureDirSync(PUBLIC_DIR);
+      fs.writeFileSync(path.join(PUBLIC_DIR, "data.json"), JSON.stringify(orderData, null, 2), "utf-8");
       logger.info("✅ data.json 저장 완료");
 
-      // ✅ vite build
+      // ✅ vite build 실행
       logger.info("🛠️ vite build 실행...");
       const build = spawnSync("npm", ["run", "build"], {
-        cwd: TEMPLATE_DIR,
+        cwd: TEMP_DIR,
         stdio: "inherit",
         shell: true,
       });
-
       if (build.status !== 0) {
         return res.status(500).json({ message: "❌ Vite 빌드 실패" });
       }
 
       // ✅ dist 압축
-      const zipPath = `/tmp/${orderId}.zip`;
-      fsExtra.ensureDirSync("/tmp");
+      const zipPath = path.join(os.tmpdir(), `${orderId}.zip`);
+      fsExtra.ensureDirSync(os.tmpdir());
       const output = fs.createWriteStream(zipPath);
       const archive = archiver("zip", { zlib: { level: 9 } });
 
