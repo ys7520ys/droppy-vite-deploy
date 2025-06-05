@@ -1,3 +1,9 @@
 [build]
-command = "npm run build && npm run export"
-publish = "out"
+command = "cd vite-template && npm run build"
+publish = "vite-template/dist"
+functions = "functions"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
