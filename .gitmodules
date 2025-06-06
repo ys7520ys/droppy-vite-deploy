@@ -1,0 +1,3 @@
+[submodule "functions/vite-template"]
+    path = functions/vite-template
+    url = https://github.com/your-username/your-template-repo.git
